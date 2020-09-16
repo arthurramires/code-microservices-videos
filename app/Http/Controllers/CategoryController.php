@@ -13,7 +13,7 @@ class CategoryController extends Controller
         'is_active' => 'boolean'
     ];
 
-    public function index()
+    public function index(Request $request)
     {
         return Category:all();
     }
