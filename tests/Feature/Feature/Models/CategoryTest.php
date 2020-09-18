@@ -26,4 +26,16 @@ class CategoryTest extends TestCase
            'id', 'name', 'description', 'is_active', 'created_at', 'updated_at', 'deleted_at'
        ], $categoryKey);
     }
+
+    public function testCreate(){
+        $category = Category::create([
+            'name' => 'teste1'
+        ]);
+
+        $category->refresh();
+
+        $this->assertEquals('test1', $category->name);
+        $this->assertNull($category->description);
+        $this->assertTrue((bool)$category->is_active);
+    }
 }
