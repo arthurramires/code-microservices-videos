@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Models;
 
 use App\Models\Category;
 use App\Models\Traits\Uuid;
@@ -16,13 +16,21 @@ class CategoryTest extends TestCase
      *
      * @return void
      */
+
+    private $category;
+
+    protected function setUp(): void{
+        parent::setUp();
+        $this->category = new Category();
+    }
+
+
     public function testFillable()
     {
-        $category = new Category();
         $fillable =  ['name', 'description', 'is_active'];
         $this->assertEquals(
             $fillable,
-            $category->getFillable()
+            $this->category->getFillable()
         );
     }
 
@@ -41,20 +49,18 @@ class CategoryTest extends TestCase
     public function testCasts()
     {
         $cast = ['id' => 'string'];
-        $category = new Category();
         $this->assertEquals(
             $cast,
-            $category->getCasts()
+            $this->category->getCasts()
         );
     }
 
     public function testDatesAttribute()
     {
         $dates = ['deleted_at', 'created_at', 'updated_at'];
-        $category = new Category();
         foreach($dates as $date){
-            $this->assertContains($date, $category->getDates());
+            $this->assertContains($date, $this->category->getDates());
         }
-        $this->assertCount(count($dates), $category->getDates());
+        $this->assertCount(count($dates), $this->category->getDates());
     }
 }
