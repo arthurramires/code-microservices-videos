@@ -36,6 +36,44 @@ class CategoryControllerTest extends TestCase
 
         $response
             ->assertStatus(422)
-            ->assertJsonValidationErrors(['name']);
+            ->assertJsonValidationErrors(['name'])
+            ->assertJsonMissingValidationErrors(['is_active']);
+    }
+
+    public function testStore()
+    {
+        $response = $this->json('POST', route('categories.store'), [
+            'name' => 'test',
+
+        ]);
+
+        $id = $response->json('id');
+        $category = Category::find($id);
+
+        $response
+             ->assertStatus(201)
+             ->assertJson($category->toArray());
+        $this->assertTrue($response->json('is_active'));
+        //     ->assertJsonValidationErrors(['name'])
+        //     ->assertJsonMissingValidationErrors(['is_active']);
+    }
+
+    public function testUpdate(){
+        $category = factory(Category::class)->create([
+            'is_active' => false
+        ]);
+        $response = $this->json('PUT', route('categories.update', ['category' => $category->id]),
+        [
+            'name' => 'test',
+            'is_active' => true,
+            'description' => 'test'
+        ]);
+
+        $id = $response->json('id');
+        $category = Category::find($id);
+
+        $response
+            ->assertStatus(200)
+            ->assertJson($category->toArray());
     }
 }
