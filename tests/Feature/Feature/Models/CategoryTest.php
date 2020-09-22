@@ -5,7 +5,7 @@ namespace Tests\Feature\Feature\Models;
 use App\Models\Category;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\Database\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class CategoryTest extends TestCase
@@ -54,7 +54,7 @@ class CategoryTest extends TestCase
         $category->update($data);
 
         foreach ($data as $key => $value) {
-            $this->assertEquals($value, $category->($key));
+            $this->assertEquals($value, $category->$key);
         }
     }
 
