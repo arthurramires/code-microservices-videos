@@ -20,7 +20,9 @@ class CategoryControllerTest extends TestCase
         $category = factory(Category::class)->create();
         $response = $this->get(route('categories.index'));
 
-        $response->assertStatus(200)->assertJson([$category->toArray()]);
+        $response
+            ->assertStatus(200)
+            ->assertJson([$category->toArray()]);
     }
 
     public function testShow()
@@ -28,17 +30,57 @@ class CategoryControllerTest extends TestCase
         $category = factory(Category::class)->create();
         $response = $this->get(route('categories.show', ['category' => $category->id]));
 
-        $response->assertStatus(200)->assertJson([$category->toArray()]);
+        $response
+            ->assertStatus(200)
+            ->assertJson([$category->toArray()]);
     }
 
     public function testInvalidationData()
     {
         $response = $this->json('POST', route('categories.store'), []);
+        $this->assertInvalidationRequired($response);
 
-        $response
+        $response = $this->json('POST'. route('categories.store'), [
+            'name' => str_repeat('a', 256),
+            'is_active' => 'a'
+        ]);
+
+        $this->assertInvalidationMax($response);
+        $this->assertInvalidationBoolean($response);
+
+        $category = factory(Category::class)->create();
+        $response = $this->json('PUT', 'categories.update', [
+            'category' => $category->id
+        ]);
+        $this->assertInvalidationRequired($response);
+    }
+
+    protected function assertInvalidationRequired(TestResponse $response){
+        $response 
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['name', 'is_active'])
+            ->assertJsonFragment([
+                \Lang::get('validation.max.string', ['attribute' => 'name', 'max' => 255]),
+            ])
+            ->assertJsonFragment([
+                \Lang::get('validation.boolean', ['attribute' => 'is_active']),
+            ]);
+    }
+    protected function assertInvalidationMax(TestResponse $response){
+        $response 
             ->assertStatus(422)
             ->assertJsonValidationErrors(['name'])
-            ->assertJsonMissingValidationErrors(['is_active']);
+            ->assertJsonFragment([
+                \Lang::get('validation.max.string', ['attribute' => 'name', 'max' => 255]),
+            ]);
+    }
+    protected function assertInvalidationBoolean(TestResponse $response){
+        $response 
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['is_active'])
+            ->assertJsonFragment([
+                \Lang::trans('validation.boolean', ['attribute' => 'is_active']),
+            ]);
     }
 
     public function testStore()

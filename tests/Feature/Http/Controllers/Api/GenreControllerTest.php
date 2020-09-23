@@ -20,7 +20,9 @@ class CategoryControllerTest extends TestCase
         $genre = factory(Genre::class)->create();
         $response = $this->get(route('genres.index'));
 
-        $response->assertStatus(200)->assertJson([$genre->toArray()]);
+        $response
+            ->assertStatus(200)
+            ->assertJson([$genre->toArray()]);
     }
 
     public function testShow()
@@ -28,16 +30,57 @@ class CategoryControllerTest extends TestCase
         $genre = factory(Genre::class)->create();
         $response = $this->get(route('genres.show', ['genre' => $genre->id]));
 
-        $response->assertStatus(200)->assertJson([$genre->toArray()]);
+        $response
+            ->assertStatus(200)
+            ->assertJson([$genre->toArray()]);
     }
 
     public function testInvalidationData()
     {
         $response = $this->json('POST', route('genres.store'), []);
+        $this->assertInvalidationRequired($response);
 
-        $response
+        $response = $this->json('POST'. route('genres.store'), [
+            'name' => str_repeat('a', 256),
+            'is_active' => 'a'
+        ]);
+
+        $this->assertInvalidationMax($response);
+        $this->assertInvalidationBoolean($response);
+
+        $genre = factory(Genre::class)->create();
+        $response = $this->json('PUT', 'genres.update', [
+            'genre' => $genre->id
+        ]);
+        $this->assertInvalidationRequired($response);
+    }
+
+    protected function assertInvalidationRequired(TestResponse $response){
+        $response 
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['name', 'is_active'])
+            ->assertJsonFragment([
+                \Lang::get('validation.max.string', ['attribute' => 'name', 'max' => 255]),
+            ])
+            ->assertJsonFragment([
+                \Lang::get('validation.boolean', ['attribute' => 'is_active']),
+            ]);
+    }
+    protected function assertInvalidationMax(TestResponse $response){
+        $response 
             ->assertStatus(422)
             ->assertJsonValidationErrors(['name'])
+            ->assertJsonFragment([
+                \Lang::get('validation.max.string', ['attribute' => 'name', 'max' => 255]),
+            ]);
+    }
+    protected function assertInvalidationBoolean(TestResponse $response){
+        $response 
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['is_active'])
+            ->assertJsonFragment([
+                \Lang::trans('validation.boolean', ['attribute' => 'is_active']),
+            ]);
     }
 
     public function testStore()
@@ -53,6 +96,7 @@ class CategoryControllerTest extends TestCase
         $response
              ->assertStatus(201)
              ->assertJson($genre->toArray());
+        $this->assertTrue($response->json('is_active'));
     }
 
     public function testUpdate(){
@@ -77,7 +121,7 @@ class CategoryControllerTest extends TestCase
         $genre = factory(Genre::class)->create();
         $response = $this->json('DELETE', route('genres.destroy', ['genre' => $genre->id]));
         $response->assertStatus(204);
-        $this->assertNull(Category::find($genre->id));
-        $this->assertNotNull(Category::withTrashed()->find($genre->id));
+        $this->assertNull(Genre::find($genre->id));
+        $this->assertNotNull(Genre::withTrashed()->find($genre->id));
     }
 }
