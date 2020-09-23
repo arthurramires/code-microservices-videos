@@ -2,14 +2,16 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 use App\Models\Category;
-use Tests\TestCase;
+use Tests\Traits\TestValidations;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\TestResponse;
+
 
 class CategoryControllerTest extends TestCase
 {
-    use DatabaseMigrations;
+    use DatabaseMigrations, TestValidations;
     /**
      * A basic feature test example.
      *
@@ -56,31 +58,15 @@ class CategoryControllerTest extends TestCase
     }
 
     protected function assertInvalidationRequired(TestResponse $response){
+        $this->assertInvalidationFields($response, ['name'], 'required', []);
         $response 
-            ->assertStatus(422)
-            ->assertJsonValidationErrors(['name', 'is_active'])
-            ->assertJsonFragment([
-                \Lang::get('validation.max.string', ['attribute' => 'name', 'max' => 255]),
-            ])
-            ->assertJsonFragment([
-                \Lang::get('validation.boolean', ['attribute' => 'is_active']),
-            ]);
+            ->assertJsonMissingValidationErrors(['is_active']);
     }
     protected function assertInvalidationMax(TestResponse $response){
-        $response 
-            ->assertStatus(422)
-            ->assertJsonValidationErrors(['name'])
-            ->assertJsonFragment([
-                \Lang::get('validation.max.string', ['attribute' => 'name', 'max' => 255]),
-            ]);
+        $this->assertInvalidationFields($response, ['name'], 'max.string', ['max' => 255]);
     }
     protected function assertInvalidationBoolean(TestResponse $response){
-        $response 
-            ->assertStatus(422)
-            ->assertJsonValidationErrors(['is_active'])
-            ->assertJsonFragment([
-                \Lang::trans('validation.boolean', ['attribute' => 'is_active']),
-            ]);
+        $this->assertInvalidationFields($response, ['is_active'], 'boolean', []);
     }
 
     public function testStore()
