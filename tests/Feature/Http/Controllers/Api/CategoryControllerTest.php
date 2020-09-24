@@ -90,22 +90,32 @@ class CategoryControllerTest extends TestCase
     }
 
     public function testUpdate(){
-        $category = factory(Category::class)->create([
+        $this->category = factory(Category::class)->create([
             'is_active' => false
         ]);
-        $response = $this->json('PUT', route('categories.update', ['category' => $category->id]),
-        [
+
+        $data = [
             'name' => 'test',
             'is_active' => true,
             'description' => 'test'
+        ];
+        $response = $this->assertUpdate($data, $data + ['deleted_at' => null]);
+        $response->assertJsonStructure([
+            'created_at', 
+            'updated_at'
         ]);
 
-        $id = $response->json('id');
-        $category = Category::find($id);
+        $data = [
+            'name' => 'test',
+            'description' => ''
+        ];
+        $this->assertUpdate($data, array_merge($data, ['description' => null]));
 
-        $response
-            ->assertStatus(200)
-            ->assertJson($category->toArray());
+        $data['description'] = 'test';
+        $this->assertUpdate($data, array_merge($data, ['description' => 'test']));
+
+        $data['description'] = null;
+        $this->assertUpdate($data, array_merge($data, ['description' => null]));
     }
 
     public function testDestroy(){
