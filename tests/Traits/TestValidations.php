@@ -5,7 +5,7 @@ namespace Tests\Traits;
 use Illuminate\Foundation\Testing\TestResponse;
 
 
-trait Testvalidations{
+trait TestValidations{
 
     protected function assertInvalidationInStoreAction(
         array $data,
