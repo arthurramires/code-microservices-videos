@@ -15,6 +15,7 @@ class CategoryControllerStub extends BasicCrudController
    {
       return [
          'name' => 'required|max:255',
+         'description' => 'nullable'
       ];
    }
 }
