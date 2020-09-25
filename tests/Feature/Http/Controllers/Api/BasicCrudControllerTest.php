@@ -10,6 +10,7 @@ class BasicCrudControllerTest extends TestCase
     protected function setUp(): void{
         parent::setUp();
         CategoryStub::createTable();
+        $this->controller = new CategoryControllerStub();
     }
 
     protected function tearDown(): void{
@@ -19,9 +20,19 @@ class BasicCrudControllerTest extends TestCase
 
     public function testIndex(){
         $category = CategoryStub::create(['name' => 'test_name', 'description' => 'test_description']);
-        $controller = new CategoryControllerStub();
-        $result = $controller->index()->toArray();
+        $result = $this->controller->index()->toArray();
 
         $this->assertEquals([$category->toArray()], $result);
+    }
+
+    public function testInvalidationDataInStore(){
+        $request = \Mockery::mock(Request::class);
+
+        $request
+            ->shouldReceive('all')
+            ->once()
+            ->andReturn(['name' => '']);
+
+        $this->controller->store($request);
     }
 }
