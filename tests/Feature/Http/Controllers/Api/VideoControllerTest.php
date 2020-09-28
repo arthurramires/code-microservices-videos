@@ -12,6 +12,7 @@ class VideoControllerTest extends TestCase
     use DatabaseMigrations, TestValidations, TestSaves;
 
     private $video;
+    private $sendData;
     /**
      * A basic feature test example.
      *
@@ -21,6 +22,13 @@ class VideoControllerTest extends TestCase
     protected function setUp(): void{
         parent::setUp();
         $this->video = factory(Video::class)->create();
+        $this->sendData = [
+            'title' => 'title',
+            'description' => 'description',
+            'year_lauched' => 2010,
+            'rating' => Video::RATING_LIST[0],
+            'duration' => 90
+        ] 
     }
 
     public function testIndex()
@@ -119,63 +127,46 @@ class VideoControllerTest extends TestCase
         $this->assertInvalidationInUpdateAction($data, 'in');
     }
 
-    public function testStore()
+    public function testSave()
     {
         $data = [
-            'name' => 'teste'
+            [
+                'send_data' => $this->sendData,
+                'test_data' => $this->sendData + ['opened' => false]
+            ],
+            [
+                'send_data' => $this->sendData + ['opened' => true],
+                'test_data' => $this->sendData + ['opened' => true]
+            ],
+            [
+                'send_data' => $this->sendData + ['rating' => Video::RATING_LIST[1]],
+                'test_data' => $this->sendData + ['rating' => Video::RATING_LIST[1]]
+            ]
         ];
-
-        $response = $this->assertStore($data, $data + ['description' => null, 'is_active' => true, 'deleted_at' => null]);
         
-        $response->assertJsonStructure([
-            'created_at', 
-            'updated_at'
-        ]);
+        foreach($data as $key => $value){
+            $response = $this->assertStore($value['send_data'], $value['test_data'] + ['deleted_at' => null]);
+            $response->assertJsonStructure([
+                'created_at',
+                'updated_at'
+            ]);
 
-        $data = [
-            'name' => 'teste',
-            'description' => 'description',
-            'is_active' => false
-        ];
+            $response = $this->assertUpdate($value['send_data'], $value['test_data'] + ['deleted_at' => null]);
+            $response->assertJsonStructure([
+                'created_at',
+                'updated_at'
+            ]);
+        }
+        
 
-        $this->assertStore($data, $data + ['description' => 'description', 'is_active' => false]);
 
-    }
-
-    public function testUpdate(){
-        $this->category = factory(Category::class)->create([
-            'is_active' => false
-        ]);
-
-        $data = [
-            'name' => 'test',
-            'is_active' => true,
-            'description' => 'test'
-        ];
-        $response = $this->assertUpdate($data, $data + ['deleted_at' => null]);
-        $response->assertJsonStructure([
-            'created_at', 
-            'updated_at'
-        ]);
-
-        $data = [
-            'name' => 'test',
-            'description' => ''
-        ];
-        $this->assertUpdate($data, array_merge($data, ['description' => null]));
-
-        $data['description'] = 'test';
-        $this->assertUpdate($data, array_merge($data, ['description' => 'test']));
-
-        $data['description'] = null;
-        $this->assertUpdate($data, array_merge($data, ['description' => null]));
     }
 
     public function testDestroy(){
-        $response = $this->json('DELETE', route('categories.destroy', ['category' => $this->category->id]));
+        $response = $this->json('DELETE', route('videos.destroy', ['video' => $this->video->id]));
         $response->assertStatus(204);
-        $this->assertNull(Category::find($this->category->id));
-        $this->assertNotNull(Category::withTrashed()->find($this->category->id));
+        $this->assertNull(Video::find($this->video->id));
+        $this->assertNotNull(Video::withTrashed()->find($this->video->id));
     }
 
     protected function routeStore(){
