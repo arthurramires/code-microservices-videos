@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Models\Category;
+use App\Models\Genre;
 use App\Models\Traits\Uuid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -31,4 +33,12 @@ class Video extends Model
     ];
 
     public $incrementing = false;
+
+    public function categories(){
+        return $this->belongsToMany(Category::class);
+    }
+
+    public function genres(){
+        return $this->belongsToMany(Genre::class);
+    }
 }
