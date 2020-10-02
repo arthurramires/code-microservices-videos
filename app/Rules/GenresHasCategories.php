@@ -52,7 +52,7 @@ class GenresHasCategories implements Rule
     protected function getRows($genreId): Collection{
         return \DB::
             table('category_genre')
-            ->where('genre_id')
+            ->where('genre_id', $genreId)
             ->whereIn('category_id', $this->categoriesId)
             ->get();
     }
