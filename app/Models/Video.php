@@ -34,6 +34,40 @@ class Video extends Model
 
     public $incrementing = false;
 
+    public static function create(array $attributes = []){
+        try{
+            \DB::beginTransaction();
+            $objeto = static::query()->create($attributes);
+            \DB::commit();
+            return $objeto;
+        }catch (\Exception $e){
+            if(isset($objeto)){
+                //excluir os arquivos de upload
+            }
+            \DB::rollBack();
+            throw $e;
+        }
+    }
+
+    public function update(array $attributes = [], array $options = []){
+        try{
+            \DB::beginTransaction();
+            $saved = parent::update($attributes, $options);
+            if($saved){
+                //uploads aqui
+                //excluir os antigos    
+            }
+            \DB::commit();
+            return $saved;
+        }catch (\Exception $e){
+            if(isset($saved)){
+                //excluir os arquivos de upload
+            }
+            \DB::rollBack();
+            throw $e;
+        }
+    }
+
     public function categories(){
         return $this->belongsToMany(Category::class)->withTrashed();
     }

@@ -1,2 +1,2 @@
-CREATE DATABASE code_mivro_videos;
-CREATE DATABASE code_mivro_videos_test;
+CREATE DATABASE code_micro_videos;
+CREATE DATABASE code_micro_videos_test;

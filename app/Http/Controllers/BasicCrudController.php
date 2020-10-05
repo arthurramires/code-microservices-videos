@@ -12,7 +12,7 @@ abstract class BasicCrudController extends Controller
 
     public function index()
     {
-        return $this->model:all();
+        return $this->model()::all();
     }
 
     public function store(Request $request){
@@ -26,7 +26,7 @@ abstract class BasicCrudController extends Controller
     protected function findOrFail($id){
         $model = $this->model();
         $keyName = (new $model)->getRouteKeyName();
-        return $this->model()::where($keyName, $id)->firtOrFail();
+        return $this->model()::where($keyName, $id)->firstOrFail();
     }
 
     public function show($id){
