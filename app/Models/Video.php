@@ -17,7 +17,7 @@ class Video extends Model
     protected $fillable = [
         'title',
         'description',
-        'yeat_launched',
+        'year_launched',
         'opended',
         'rating',
         'duration'
@@ -38,6 +38,7 @@ class Video extends Model
         try{
             \DB::beginTransaction();
             $objeto = static::query()->create($attributes);
+            static::handleRelations($objeto, $attributes);
             \DB::commit();
             return $objeto;
         }catch (\Exception $e){
@@ -53,6 +54,7 @@ class Video extends Model
         try{
             \DB::beginTransaction();
             $saved = parent::update($attributes, $options);
+            static::handleRelations($this, $attributes);
             if($saved){
                 //uploads aqui
                 //excluir os antigos    
@@ -66,6 +68,16 @@ class Video extends Model
             \DB::rollBack();
             throw $e;
         }
+    }
+
+    protected static function handleRelations(Video $video, array $attributes){
+        if(isset($attributes['categories_id'])){
+            $video->categories()->sync($attributes['categories_id']);
+        }
+        if(isset($attributes['genres_id'])){
+            $video->genres()->sync($attributes['genres_id']);
+        }
+        
     }
 
     public function categories(){

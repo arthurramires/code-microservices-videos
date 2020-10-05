@@ -43,37 +43,37 @@ class VideoControllerTest extends TestCase
             ->assertJson([$this->video->toArray()]);
     }
 
-    public function testRollbackStore(){
-        $controller = \Mockery::mock(VideoController::class)
-            ->makePartial()
-            ->shouldAllowMockingProtectedMethods();
+    // public function testRollbackStore(){
+    //     $controller = \Mockery::mock(VideoController::class)
+    //         ->makePartial()
+    //         ->shouldAllowMockingProtectedMethods();
 
-        $controller
-            ->shouldReceive('validate')
-            ->withAnyArgs()
-            ->andReturn($this->sendData);
+    //     $controller
+    //         ->shouldReceive('validate')
+    //         ->withAnyArgs()
+    //         ->andReturn($this->sendData);
         
-        $controller
-            ->shouldReceive('rulesStore')
-            ->withAnyArgs()
-            ->andReturn([]);
+    //     $controller
+    //         ->shouldReceive('rulesStore')
+    //         ->withAnyArgs()
+    //         ->andReturn([]);
 
 
-        $request = \Mockery::mock(Request::class);
+    //     $request = \Mockery::mock(Request::class);
 
-        $request->shouldReceive('get')->withAnyArgs()->andReturnNull();
+    //     $request->shouldReceive('get')->withAnyArgs()->andReturnNull();
 
-        $controller->shouldReceive('handleRelations')
-            ->once()
-            ->andThrow(new TestException());
+    //     $controller->shouldReceive('handleRelations')
+    //         ->once()
+    //         ->andThrow(new TestException());
 
-        try {
-            $controller 
-                ->store($request);
-        }catch (TestException $exception){
-            $this->assertCount(1, Video::all());
-        }
-    }
+    //     try {
+    //         $controller 
+    //             ->store($request);
+    //     }catch (TestException $exception){
+    //         $this->assertCount(1, Video::all());
+    //     }
+    // }
 
     public function testShow()
     {
