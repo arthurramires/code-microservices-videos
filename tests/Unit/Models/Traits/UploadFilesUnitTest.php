@@ -64,4 +64,24 @@ class UploadFilesUnitTest extends TestCase
         \Storage::assertMissing("1/{$file1->hashName()}");
         \Storage::assertMissing("1/{$file2->hashName()}");
     }
+
+    public function testExtractFiles(){
+        $attributes = [];
+        $files = UploadFilesStub::extractFiles($attributes);
+        $this->assertCount(0, $attributes);
+        $this->assertCount(0, $files);
+
+        $attributes = ['file1' => 'teste'];
+        $files = UploadFilesStub::extractFiles($attributes);
+        $this->assertCount(1, $attributes);
+        $this->assertCount(0, $files);
+
+        $file1 = UploadedFile::fake()->create('video.mp4');
+        $attributes = ['file1' => $file1, 'other' => 'test'];
+        $files = UploadFilesStub::extractFiles($attributes);
+        $this->assertCount(2, $attributes);
+        $this->assertEquals(['file1' => $file1->hashName(), 'other' => 'test'], $attributes);
+        $this->assertEquals([$file1], $files);
+
+    }
 }
