@@ -1,15 +1,10 @@
 <?php
 
-namespace Tests\Unit\Models;
+namespace Tests\Unit\Models\Traits;
 
-use App\Models\Category;
-use App\Models\Traits\Uuid;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Test\Stubs\Models\UploadFilesStub;
+use Tests\Stubs\Models\UploadFilesStub;
 
 class UploadFilesUnitTest extends TestCase
 {

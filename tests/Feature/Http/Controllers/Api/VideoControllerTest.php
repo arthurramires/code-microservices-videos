@@ -6,6 +6,8 @@ use Tests\Traits\TestValidations;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\Exceptions\TestException;
 use Tests\Traits\TestSaves;
+use Tests\TestCase;
+
 
 class VideoControllerTest extends TestCase
 {

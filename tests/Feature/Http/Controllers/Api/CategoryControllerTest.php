@@ -5,6 +5,8 @@ use App\Models\Category;
 use Tests\Traits\TestValidations;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\Traits\TestSaves;
+use Tests\TestCase;
+
 
 class CategoryControllerTest extends TestCase
 {

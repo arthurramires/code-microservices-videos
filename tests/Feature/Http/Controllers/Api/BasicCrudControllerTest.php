@@ -3,9 +3,10 @@
 namespace Tests\Feature\Http\Controllers\Api;
 
 use App\Http\Controllers\BasicCrudController;
-use App\Models\CategoryStub;
 use Illuminate\Validation\ValidationException;
-use Test\Stubs\Models\CategoryStub as ModelsCategoryStub;
+use Tests\Stubs\Models\CategoryStub;
+use Tests\TestCase;
+
 use Tests\Stubs\Controllers\CategoryControllerStub;
 
 class BasicCrudControllerTest extends TestCase
@@ -101,7 +102,7 @@ class BasicCrudControllerTest extends TestCase
 
     public function testDestroy(){
         $category = CategoryStub::create(['name' => 'test_name', 'description' => 'test_description']);
-        $result = $this->controller->destroy($request, $category->id);
+        $result = $this->controller->destroy($category->id);
         $this
             ->createTestResponse($result)
             ->assertStatus(204);

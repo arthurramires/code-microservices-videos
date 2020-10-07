@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\Stubs\Models;
+namespace Tests\Stubs\Models;
 
 use App\Models\Traits\UploadFiles;
 use Illuminate\Database\Eloquent\Model;

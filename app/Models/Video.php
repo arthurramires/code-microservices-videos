@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use App\Models\Category;
 use App\Models\Genre;
@@ -34,7 +34,7 @@ class Video extends Model
     ];
 
     public $incrementing = false;
-    public static $fileFields = ['filme', 'banner', 'trailer'];
+    public static $fileFields = ['video_file'];
 
     public static function create(array $attributes = []){
         $files = self::extractFiles($attributes);

@@ -1,15 +1,13 @@
 <?php
 
-namespace Tests\Feature\Feature\Models;
+namespace Tests\Feature\Models;
 
 use App\Models\Category;
 use App\Models\Genre;
-use App\Video;
+use App\Models\Video;
 use Illuminate\Database\QueryException;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class VideoTest extends TestCase
 {
@@ -35,12 +33,12 @@ class VideoTest extends TestCase
 
     public function testList()
     {
-       factory(Video::class, 1)->create();
-       $videos = Category::all();
+       Video::create($this->data);
+       $videos = Video::all();
        $this->assertCount(1, $videos);
        $videosKey = array_keys($videos->first()->getAttributes());
        $this->assertEqualsCanonicalizing([
-           'id', 'title', 'description', 'year_launched','opened','rating','duration','created_at', 'updated_at', 'deleted_at'
+           'id', 'title', 'description','year_launched','video_file','opened','rating','duration','created_at', 'updated_at', 'deleted_at'
        ], $videosKey);
     }
 
@@ -51,11 +49,6 @@ class VideoTest extends TestCase
         $this->assertEquals(36, strlen($video->id));
         $this->assertFalse($video->opened);
         $this->assertDatabaseHas('videos', $this->data + ['opened' => false]);
-
-        $video = Video::create($this->data + ['opened' => true]);
-
-        $this->assertTrue($video->opened);
-        $this->assertDatabaseHas('videos', ['opened' => true]);
     }
 
     public function testCreateWithRelations(){
@@ -80,7 +73,7 @@ class VideoTest extends TestCase
     protected function assertHasGenre($videoId, $genreId){
         $this->assertDatabaseHas('genre_video', [
             'video_id' => $videoId,
-            'category_id' => $genreId,
+            'genre_id' => $genreId,
         ]);
     }
 
@@ -127,28 +120,6 @@ class VideoTest extends TestCase
             ]);
         }catch (QueryException $exception){
             $this->assertCount(0, Video::all());
-            $hasError = true;
-        }
-        $this->assertTrue($hasError);
-    }
-
-    public function testRollbackUpdate(){
-        $video = factory(Video::class)->create(); 
-        $oldTitle = $video->title;  
-        $hasError = false;
-        try {
-            $video->update([
-                'title' => 'title',
-                'description' => 'description',
-                'year_launched' => 2010,
-                'rating' => Video::RATING_LIST[0],
-                'duration' => 90,
-                'categories_id' => [0,1,2]
-            ]);
-        }catch (QueryException $exception){
-            $this->assertDatabaseHas('videos', [
-                'title' => $oldTitle
-            ]);
             $hasError = true;
         }
         $this->assertTrue($hasError);

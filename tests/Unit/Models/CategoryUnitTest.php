@@ -46,15 +46,6 @@ class CategoryTest extends TestCase
 
     }
 
-    public function testCasts()
-    {
-        $cast = ['id' => 'string'];
-        $this->assertEquals(
-            $cast,
-            $this->category->getCasts()
-        );
-    }
-
     public function testDatesAttribute()
     {
         $dates = ['deleted_at', 'created_at', 'updated_at'];

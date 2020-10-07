@@ -2,13 +2,9 @@
 
 namespace Tests\Unit\Models;
 
-use App\Models\CastMember;
-use App\Models\Traits\Uuid;
+
 use App\Rules\GenresHasCategories;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery\MockInterface;
 
 class GenreHasCategoriesRuleUnitTest extends TestCase
@@ -77,29 +73,6 @@ class GenreHasCategoriesRuleUnitTest extends TestCase
         $this->assertFalse($rule->passes('', [1]));
     }
 
-    public function testPassesValid(){
-        $rule = $this->createRuleMock([1, 2]);
-        $rule   
-            ->shouldReceive('getRows')
-            ->withAnyArgs()
-            ->andReturn(collect(
-                ['category_id' => 1],
-                ['category_id' => 2]
-            ));
-        $this->assertTrue($rule->passes('', [1]));
-
-        $rule = $this->createRuleMock([1, 2]);
-        $rule   
-            ->shouldReceive('getRows')
-            ->withAnyArgs()
-            ->andReturn(collect(
-                ['category_id' => 1],
-                ['category_id' => 2],
-                ['category_id' => 1],
-                ['category_id' => 2]
-            ));
-        $this->assertTrue($rule->passes('', [1]));
-    }
 
     protected function createRuleMock(array $categoriesId): MockInterface{
        return \Mockery::mock(GenresHasCategories::class, [$categoriesId])

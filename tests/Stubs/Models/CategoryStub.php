@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\Stubs\Models;
+namespace Tests\Stubs\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -11,7 +11,7 @@ class CategoryStub extends Model
     protected $fillable = ['name', 'description'];
 
     public static function createTable(){
-        \Schema::create('categories', function (Blueprint $table) {
+        \Schema::create('category_stubs', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
             $table->text('description')->nullable();

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Models;
+namespace Tests\Feature\Rules;
 
 use App\Models\CastMember;
 use App\Models\Category;

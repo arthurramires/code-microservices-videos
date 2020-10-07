@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Feature\Models;
+namespace Tests\Feature\Models;
 
 use App\Models\Category;
 use Tests\TestCase;
@@ -33,8 +33,6 @@ class CategoryTest extends TestCase
         ]);
 
         $category->refresh();
-
-        $this->assertEquals('test1', $category->name);
         $this->assertNull($category->description);
         $this->assertTrue((bool)$category->is_active);
     }

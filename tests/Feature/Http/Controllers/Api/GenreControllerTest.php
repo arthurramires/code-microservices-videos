@@ -4,7 +4,6 @@ namespace Tests\Feature\Http\Controllers\Api;
 
 use App\Models\Category;
 use App\Models\Genre;
-use Tests\TestCase;
 use Tests\Traits\TestValidations;
 
 use Illuminate\Foundation\Testing\TestResponse;
@@ -12,8 +11,10 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Exceptions\TestException;
+use Tests\TestCase;
 
-class CategoryControllerTest extends TestCase
+
+class GenreControllerTest extends TestCase
 {
     use DatabaseMigrations, TestValidations;
     /**
@@ -225,5 +226,16 @@ class CategoryControllerTest extends TestCase
         $response->assertStatus(204);
         $this->assertNull(Genre::find($genre->id));
         $this->assertNotNull(Genre::withTrashed()->find($genre->id));
+    }
+
+    protected function routeStore(){
+        return route('genres.store');
+    }
+    protected function routeUpdate(){
+        return route('genres.update', ['genre' => $this->genre->id]);
+    }
+
+    protected function model(){
+        return Genre::class;
     }
 }

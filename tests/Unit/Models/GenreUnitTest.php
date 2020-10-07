@@ -46,15 +46,6 @@ class GenreUnitTest extends TestCase
 
     }
 
-    public function testCasts()
-    {
-        $cast = ['id' => 'string'];
-        $this->assertEquals(
-            $cast,
-            $this->genre->getCasts()
-        );
-    }
-
     public function testDatesAttribute()
     {
         $dates = ['deleted_at', 'created_at', 'updated_at'];
