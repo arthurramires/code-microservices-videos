@@ -19,19 +19,20 @@ class VideoController extends BasicCrudController
             'opened' => 'boolean',
             'rating' => 'required|in:' . implode(',', Video::RATING_LIST),
             'duration' => 'required|integer',
-            'categories_id' => 'required|array|exists:categories,id,id,deleted_at,NULL',
+            'categories_id' => 'required|array|exists:categories,id,deleted_at,NULL',
             'genres_id' => [
                 'required',
                 'array',
                 'exists:genres,id,deleted_at,NULL',
             ],
-            'video_file' => 'mimetypes:video/mp4|max:12'
+            //'video_file' => 'mimetypes:video/mp4|max:12'
+            'video_file' => 'required'
         ];
     }
 
     public function store(Request $request){
         $this->addRulesIfGenreHasCategories($request);
-        $validateData = $this->validate($request, $this->rulesStore());
+        $validateData = $this->validate($request, $this->rules);
         $obj = $this->model()::create($validateData);
         $obj->refresh();
         return $obj;
