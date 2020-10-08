@@ -1,16 +1,15 @@
 <?php
 
-namespace Tests\Feature\Http\Controllers\Api;
+namespace Tests\Feature\Http\Controllers\Api\VideoController;
 use App\Models\Video;
 use Tests\Traits\TestValidations;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\UploadedFile;
 use Tests\Exceptions\TestException;
 use Tests\Traits\TestSaves;
-use Tests\TestCase;
 
 
-class VideoControllerTest extends TestCase
+class VideoControllerTest extends BaseVideoControllerTestCase
 {
     
     use TestValidations, TestSaves;
@@ -24,38 +23,6 @@ class VideoControllerTest extends TestCase
             ->assertStatus(200)
             ->assertJson([$this->video->toArray()]);
     }
-
-    // public function testRollbackStore(){
-    //     $controller = \Mockery::mock(VideoController::class)
-    //         ->makePartial()
-    //         ->shouldAllowMockingProtectedMethods();
-
-    //     $controller
-    //         ->shouldReceive('validate')
-    //         ->withAnyArgs()
-    //         ->andReturn($this->sendData);
-        
-    //     $controller
-    //         ->shouldReceive('rulesStore')
-    //         ->withAnyArgs()
-    //         ->andReturn([]);
-
-
-    //     $request = \Mockery::mock(Request::class);
-
-    //     $request->shouldReceive('get')->withAnyArgs()->andReturnNull();
-
-    //     $controller->shouldReceive('handleRelations')
-    //         ->once()
-    //         ->andThrow(new TestException());
-
-    //     try {
-    //         $controller 
-    //             ->store($request);
-    //     }catch (TestException $exception){
-    //         $this->assertCount(1, Video::all());
-    //     }
-    // }
 
     public function testShow()
     {
