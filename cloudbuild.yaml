@@ -1,8 +1,25 @@
 steps:
+    - id: 'Gerando service-account.json'
+    - name: 'gcr.io/gcloud-builders/gcloug'
+      args:
+          - kms 
+          - encrypt 
+          - --ciphertext-file=./storage/credentials/google/service-account.json.enc 
+          - --plaintext-file=./storage/credentials/google/service-account.json 
+          - --location=global 
+          - --keyring=testing-lesson 
+          - --key=service-account
 
     - id: "Rodando docker-compose"
       name: 'gcr.io/$PROJECT_ID/docker-compose:1.25.5'
       args: ['-f','docker-compose.prod.yaml','up','-d']
+      env: 
+          - GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID
+          - GOOGLE_CLOUD_KEY_FILE=service-account.json
+          - GOOGLE_CLOUD_STORAGE_BUCKET=code_micro_videos
+          - GOOGLE_CLOUD_STORAGE_API_URI=http://storage.cloud.google.com/code_micro_videos
+          - TESTING_PROD=true
+
     
     - id: "Rodando composer"
       name: 'gcr.io/cloud-builders/docker'
