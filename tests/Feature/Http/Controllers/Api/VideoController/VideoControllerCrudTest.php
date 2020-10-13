@@ -9,7 +9,7 @@ use Tests\Exceptions\TestException;
 use Tests\Traits\TestSaves;
 
 
-class VideoControllerTest extends BaseVideoControllerTestCase
+class VideoControllerCrudTest extends BaseVideoControllerTestCase
 {
     
     use TestValidations, TestSaves;

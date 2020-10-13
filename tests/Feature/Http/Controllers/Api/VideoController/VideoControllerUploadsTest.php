@@ -9,7 +9,7 @@ use Tests\Exceptions\TestException;
 use Tests\Traits\TestSaves;
 use Tests\Traits\TestUploads;
 
-class VideoControllerTest extends BaseVideoControllerTestCase
+class VideoControllerUploadsTest extends BaseVideoControllerTestCase
 {
     
     use TestValidations, TestUploads;
