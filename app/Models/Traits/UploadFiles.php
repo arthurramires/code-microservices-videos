@@ -55,6 +55,10 @@ trait UploadFiles
         \Storage::delete("{$this->uploadDir()}/{$filename}");
     }
 
+    public function relativeFilePath($value){
+        return "{$this->uploadDir()}/{$value}";
+    }
+
     public static function extractFiles(array &$attributes = []){
         $files = [];
 
@@ -65,5 +69,9 @@ trait UploadFiles
             }
         }
         return $files;
+    }
+
+    protected function getFileUrl($filename){
+        return \Storage::url($this->relativeFilePath($filename));
     }
 }

@@ -2,11 +2,9 @@
 
 namespace Tests\Feature\Http\Controllers\Api\VideoController;
 use App\Models\Video;
+use Illuminate\Foundation\Testing\TestResponse;
 use Tests\Traits\TestValidations;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\UploadedFile;
-use Tests\Exceptions\TestException;
-use Tests\Traits\TestSaves;
 use Tests\Traits\TestUploads;
 
 class VideoControllerUploadsTest extends BaseVideoControllerTestCase
@@ -14,11 +12,38 @@ class VideoControllerUploadsTest extends BaseVideoControllerTestCase
     
     use TestValidations, TestUploads;
 
+    public function testInvalidationThumbField(){
+        $this->assertInvalidationFile(
+            'thumb_file',
+            'jpg',
+            Video::THUMB_FILE_MAX_SIZE,
+            'image'
+        );
+    }
+
+    public function testInvalidationBannerField(){
+        $this->assertInvalidationFile(
+            'banner_file',
+            'jpg',
+            Video::BANNER_FILE_MAX_SIZE,
+            'image'
+        );
+    }
+    
+    public function testInvalidationTrailerField(){
+        $this->assertInvalidationFile(
+            'trailer_file',
+            'mp4',
+            Video::TRAILER_FILE_MAX_SIZE,
+            'mimetypes', ['values' => 'video/mp4']
+        );
+    }
+
     public function testInvalidationVideoField(){
         $this->assertInvalidationFile(
             'video_file',
             'mp4',
-            12,
+            Video::VIDEO_FILE_MAX_SIZE,
             'mimetypes', ['values' => 'video/mp4']
         );
     }
@@ -94,10 +119,8 @@ class VideoControllerUploadsTest extends BaseVideoControllerTestCase
             );
 
             $response->assertStatus(201);
-            $id = $response->json('id');
-            foreach($files as $file){
-                \Storage::assertExists("$id/{$file->hasName()}");
-            }
+
+            $this->assertFilesOnPersist($response, $files);
     }
 
     public function testSave()
@@ -155,6 +178,11 @@ class VideoControllerUploadsTest extends BaseVideoControllerTestCase
         }
     }
 
+    protected function assertFilesOnPersist(TestResponse $response, $files){
+        $id = $response->json('id');
+        $video = Video::find($id);
+        $this->assertFilesExistsInStorage($video, $files);
+    }
 
     protected function routeStore(){
         return route('videos.store');
@@ -169,7 +197,10 @@ class VideoControllerUploadsTest extends BaseVideoControllerTestCase
     
     protected function getFiles(){
         return [
-            'video_file' => UploadedFile::fake()->create('video_file.mp4')
+            'thumb_file' => UploadedFile::fake()->create('thumb_file.jpg'),
+            'banner_file' => UploadedFile::fake()->create('banner_file.jpg'),
+            'trailer_file' => UploadedFile::fake()->create('trailer_file.mp4'),
+            'video_file' => UploadedFile::fake()->create('video_file.mp4'),
         ];
     }
 }
