@@ -5,11 +5,12 @@ namespace Tests\Prod\Models\Traits;
 use Tests\TestCase;
 use Illuminate\Http\UploadedFile;
 use Tests\Stubs\Models\UploadFilesStub;
+use Tests\Traits\TestProd;
 use Tests\Traits\TestStorages;
 
 class UploadFilesProdTest extends TestCase
 {
-    use TestStorages;
+    use TestStorages, TestProd;
     /**
      * A basic unit test example.
      *
@@ -23,6 +24,7 @@ class UploadFilesProdTest extends TestCase
         $this->obj = new UploadFilesStub();
         \Config::set('filesystems.default', 'gcs');
         $this->deleteAllFiles();
+        $this->skipTestIfNotProd();
     }
 
     public function testUploadFile(){
