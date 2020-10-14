@@ -29,6 +29,8 @@ class Video extends Model
         'duration',
         'video_file',
         'thumb_file',
+        'trailer_file',
+        'banner_file',
     ];
 
     protected $dates = ['deleted_at'];
