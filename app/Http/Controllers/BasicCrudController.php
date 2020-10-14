@@ -33,14 +33,16 @@ abstract class BasicCrudController extends Controller
 
     public function show($id){
         $obj = $this->findOrFail($id);
-        return $obj;
+        $resource = $this->resource();
+        return new $resource($obj);
     }
 
     public function update(Request $request,$id){
         $obj = $this->findOrFail($id);
         $validateData = $this->validate($request, $this->rulesUpdate());
         $obj->update($validateData);
-        return $obj;
+        $resource = $this->resource();
+        return new $resource($obj);
     }
 
     public function destroy($id){

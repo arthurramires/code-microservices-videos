@@ -15,10 +15,10 @@ class CategoryController extends BasicCrudController
         'is_active' => 'boolean'
     ];
 
-    public function show($id){
-        $obj = parent::show($id);
-        return new CategoryResource($obj);
-    }
+    // public function show($id){
+    //     $obj = parent::show($id);
+    //     return new CategoryResource($obj);
+    // }
 
     public function index(){
         $collection = parent::index();

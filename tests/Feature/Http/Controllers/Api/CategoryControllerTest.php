@@ -1,17 +1,19 @@
 <?php
 
 namespace Tests\Feature\Http\Controllers\Api;
+
+use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use Tests\Traits\TestValidations;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\Traits\TestSaves;
 use Tests\TestCase;
-
+use Tests\Traits\TestResources;
 
 class CategoryControllerTest extends TestCase
 {
     
-    use DatabaseMigrations, TestValidations, TestSaves;
+    use DatabaseMigrations, TestValidations, TestSaves, TestResources;
 
     private $category;
     private $serializedFields = [
@@ -49,7 +51,9 @@ class CategoryControllerTest extends TestCase
 
         $response
             ->assertStatus(200)
-            ->assertJson([$this->category->toArray()]);
+            ->assertJsonStructure([
+                'data' => $this->serializedFields
+            ]);
     }
 
     public function testInvalidationData()
@@ -96,7 +100,9 @@ class CategoryControllerTest extends TestCase
         ];
 
         $this->assertStore($data, $data + ['description' => 'description', 'is_active' => false]);
-
+        $id = $response->json('data.id');
+        $resource = new CategoryResource(Category::find($id));
+        $this->assertResource($response, $resource);
     }
 
     public function testUpdate(){
@@ -111,9 +117,12 @@ class CategoryControllerTest extends TestCase
         ];
         $response = $this->assertUpdate($data, $data + ['deleted_at' => null]);
         $response->assertJsonStructure([
-            'created_at', 
-            'updated_at'
+            'data' => $this->serializedFields
         ]);
+
+        $id = $response->json('data.id');
+        $resource = new CategoryResource(Category::find($id));
+        $this->assertResource($response, $resource);
 
         $data = [
             'name' => 'test',
