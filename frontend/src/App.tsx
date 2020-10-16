@@ -1,12 +1,17 @@
 import React from 'react';
-import logo from './logo.svg';
-import {Button} from '@material-ui/core';
 import {Navbar} from './components/Navbar';
-//import './App.css';
+import {Page} from './components/Page';
+import './App.css';
+import { Box } from '@material-ui/core';
 
 function App() {
   return (
+    <>
       <Navbar />
+      <Box paddingTop={"70px"}>
+        <Page title="Homepage"/>
+      </Box>
+    </>
   );
 }
 
