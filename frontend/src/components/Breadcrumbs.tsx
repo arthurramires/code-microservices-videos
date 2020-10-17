@@ -3,7 +3,7 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Link, { LinkProps } from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import MuiBreadcrumbs from '@material-ui/core/Breadcrumbs';
-import {Container} from '@material-ui/core';
+import {Container, Box} from '@material-ui/core';
 import { Route, MemoryRouter } from 'react-router';
 import { Link as RouterLink } from 'react-router-dom';
 import {Location} from 'history';
@@ -73,11 +73,13 @@ export default function Breadcrumbs() {
   return (
     // <MemoryRouter initialEntries={['/inbox']} initialIndex={0}>
       <Container>
-        <Route>
-          {
-            ({location}: {location: Location}) => makeBreadcrumb(location)
-          }
-        </Route>
+        <Box paddingBottom={2}>
+          <Route>
+            {
+              ({location}: {location: Location}) => makeBreadcrumb(location)
+            }
+          </Route>
+        </Box>
       </Container>
     // </MemoryRouter>
   );
