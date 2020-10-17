@@ -3,6 +3,7 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Link, { LinkProps } from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import MuiBreadcrumbs from '@material-ui/core/Breadcrumbs';
+import {Container} from '@material-ui/core';
 import { Route, MemoryRouter } from 'react-router';
 import { Link as RouterLink } from 'react-router-dom';
 import {Location} from 'history';
@@ -17,15 +18,16 @@ const useStyles = makeStyles((theme: Theme) =>
     root: {
       display: 'flex',
       flexDirection: 'column',
-      width: 360,
     },
-    lists: {
-      backgroundColor: theme.palette.background.paper,
-      marginTop: theme.spacing(1),
-    },
-    nested: {
-      paddingLeft: theme.spacing(4),
-    },
+    linkRouter: {
+      color: '#4db5ab',
+      "&:focus, &:active": {
+        color: '#4db5ab',
+      },
+      "&:hover": {
+        color: '#055a52'
+      }
+    }
   }),
 );
 
@@ -58,7 +60,7 @@ export default function Breadcrumbs() {
               {breadcrumbNameMap[route]}
             </Typography>
           ) : (
-            <LinkRouter color="inherit" to={to} key={to}>
+            <LinkRouter color="inherit" to={to} key={to} className={classes.linkRouter}>
               {breadcrumbNameMap[route]}
             </LinkRouter>
           );
@@ -69,14 +71,14 @@ export default function Breadcrumbs() {
   }
 
   return (
-    <MemoryRouter initialEntries={['/inbox']} initialIndex={0}>
-      <div className={classes.root}>
+    // <MemoryRouter initialEntries={['/inbox']} initialIndex={0}>
+      <Container>
         <Route>
           {
             ({location}: {location: Location}) => makeBreadcrumb(location)
           }
         </Route>
-      </div>
-    </MemoryRouter>
+      </Container>
+    // </MemoryRouter>
   );
 }
