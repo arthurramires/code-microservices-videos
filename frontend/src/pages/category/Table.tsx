@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import MUIDataTable, { MUIDataTableColumn } from 'mui-datatables';
 import {httpVideo} from '../../utils/http';
+import {Chip} from '@material-ui/core';
+
 const columnDefinitions: MUIDataTableColumn[] =[
     {
         name: "name",
@@ -8,7 +10,12 @@ const columnDefinitions: MUIDataTableColumn[] =[
     },
     {
         name: "is_active",
-        label: "Ativo?"
+        label: "Ativo?",
+        options: {
+            customBodyRender(value, tableMeta, updateValue){
+                return value ? <Chip label="Sim" color="primary"/> : <Chip label="Não" color="secondary"/>;
+            }
+        }
     },
     {
         name: "created_at",
