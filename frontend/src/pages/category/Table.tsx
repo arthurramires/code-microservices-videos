@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import MUIDataTable, { MUIDataTableColumn } from 'mui-datatables';
 import {httpVideo} from '../../utils/http';
+import format from 'date-fns/format';
+import parseISO from 'date-fns/parseISO';
 import {Chip} from '@material-ui/core';
 
 const columnDefinitions: MUIDataTableColumn[] =[
@@ -19,7 +21,12 @@ const columnDefinitions: MUIDataTableColumn[] =[
     },
     {
         name: "created_at",
-        label: "Criado em:"
+        label: "Criado em:",
+        options: {
+            customBodyRender(value, tableMeta, updateValue){
+            return <span>{formar(parseISO(value), 'dd/MM/yyyy')}</span>;
+            }
+        }
     },
 ];
 
