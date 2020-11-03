@@ -11,7 +11,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import routes, { MyRouteProps } from '../../routes';
 
 export const Menu: React.FC = () => {
-    const listRoutes = ['dashboard', 'categories.list'];
+    const listRoutes = ['dashboard', 'categories.list', 'cast_members.list', 'genres.list'];
     const menuRoutes = routes.filter(route => listRoutes.includes(route.name));
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);

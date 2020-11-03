@@ -5,17 +5,22 @@ import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import {Chip} from '@material-ui/core';
 
+const CastMemberTypeMap = {
+    1: 'Diretor',
+    2: 'Ator'
+};
+
 const columnDefinitions: MUIDataTableColumn[] =[
     {
         name: "name",
         label: "Nome"
     },
     {
-        name: "is_active",
-        label: "Ativo?",
+        name: "type",
+        label: "Tipo",
         options: {
             customBodyRender(value, tableMeta, updateValue){
-                return value ? <Chip label="Sim" color="primary"/> : <Chip label="Não" color="secondary"/>;
+                return CastMemberTypeMap[value];
             }
         }
     },
@@ -31,19 +36,19 @@ const columnDefinitions: MUIDataTableColumn[] =[
 ];
 
 const Table: React.FC = () => {
-    const [categories, setCategories] = useState([]);
+    const [castMembers, setCastMembers] = useState([]);
 
     useEffect(() => {
         
-        httpVideo.get('categories').then(
-            response => setCategories(response.data.data)
+        httpVideo.get('cast_members').then(
+            response => setCastMembers(response.data.data)
         )
     }, []);
   return (
       <MUIDataTable
-        title="Listagem de categorias" 
+        title="Listagem de membros de elencos" 
         columns={columnDefinitions}
-        data={categories}
+        data={castMembers}
     />
   );
 }

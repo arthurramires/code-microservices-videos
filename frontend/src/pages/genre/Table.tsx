@@ -3,7 +3,6 @@ import MUIDataTable, { MUIDataTableColumn } from 'mui-datatables';
 import {httpVideo} from '../../utils/http';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
-import {Chip} from '@material-ui/core';
 
 const columnDefinitions: MUIDataTableColumn[] =[
     {
@@ -11,11 +10,11 @@ const columnDefinitions: MUIDataTableColumn[] =[
         label: "Nome"
     },
     {
-        name: "is_active",
-        label: "Ativo?",
+        name: "categories",
+        label: "Categorias",
         options: {
             customBodyRender(value, tableMeta, updateValue){
-                return value ? <Chip label="Sim" color="primary"/> : <Chip label="Não" color="secondary"/>;
+                return value.map(value => value.name).join(', ');
             }
         }
     },
@@ -31,19 +30,19 @@ const columnDefinitions: MUIDataTableColumn[] =[
 ];
 
 const Table: React.FC = () => {
-    const [categories, setCategories] = useState([]);
+    const [genres, setGenres] = useState([]);
 
     useEffect(() => {
         
-        httpVideo.get('categories').then(
-            response => setCategories(response.data.data)
+        httpVideo.get('genres').then(
+            response => setGenres(response.data.data)
         )
     }, []);
   return (
       <MUIDataTable
-        title="Listagem de categorias" 
+        title="Listagem de gêneros" 
         columns={columnDefinitions}
-        data={categories}
+        data={genres}
     />
   );
 }
