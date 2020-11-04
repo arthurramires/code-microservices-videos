@@ -25,9 +25,9 @@ const Form: React.FC = () => {
 
     const buttonProps: ButtonProps = {
         className: classes.submit,
-        variant: "outlined",
         size: "medium",
-        color: 'primary'
+        variant: "contained",
+        color: 'secondary'
     }
 
     function onSubmit(formData, event){

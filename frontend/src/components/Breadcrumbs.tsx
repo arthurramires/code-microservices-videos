@@ -73,7 +73,7 @@ export default function Breadcrumbs() {
   return (
     // <MemoryRouter initialEntries={['/inbox']} initialIndex={0}>
       <Container>
-        <Box paddingBottom={2}>
+        <Box paddingBottom={1} paddingTop={2}>
           <Route>
             {
               ({location}: {location: Location}) => makeBreadcrumb(location)

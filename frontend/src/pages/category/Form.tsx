@@ -21,8 +21,9 @@ const Form: React.FC = () => {
     });
     const buttonProps: ButtonProps = {
         className: classes.submit,
-        variant: "outlined",
-        size: "medium"
+        size: "medium",
+        variant: "contained",
+        color: 'secondary'
     }
 
     function onSubmit(formData, event){
@@ -57,7 +58,6 @@ const Form: React.FC = () => {
           <Box dir="rtl">
             <Button   
               {...buttonProps} 
-              color="primary" 
               onClick={() => onSubmit(getValues(), null)} 
             >
               Salvar
@@ -65,7 +65,6 @@ const Form: React.FC = () => {
             <Button 
               {...buttonProps} 
               type="submit"
-              color="primary" 
             >
               Salvar e continuar editando
             </Button>

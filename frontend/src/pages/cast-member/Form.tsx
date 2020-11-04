@@ -17,9 +17,9 @@ const Form: React.FC = () => {
     const { register, handleSubmit, getValues, setValue } = useForm();
     const buttonProps: ButtonProps = {
         className: classes.submit,
-        variant: "outlined",
+        variant: "contained",
         size: "medium",
-        color: 'primary'
+        color: 'secondary'
     }
 
     useEffect(() => {
