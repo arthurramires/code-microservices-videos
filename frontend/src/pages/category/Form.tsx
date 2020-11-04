@@ -55,8 +55,20 @@ const Form: React.FC = () => {
           />
           Ativo?
           <Box dir="rtl">
-            <Button {...buttonProps} onClick={() => onSubmit(getValues(), null)} >Salvar</Button>
-            <Button {...buttonProps} type="submit">Salvar e continuar editando</Button>
+            <Button   
+              {...buttonProps} 
+              color="primary" 
+              onClick={() => onSubmit(getValues(), null)} 
+            >
+              Salvar
+            </Button>
+            <Button 
+              {...buttonProps} 
+              type="submit"
+              color="primary" 
+            >
+              Salvar e continuar editando
+            </Button>
           </Box>
       </form>
   );

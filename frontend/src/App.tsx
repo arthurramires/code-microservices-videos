@@ -4,16 +4,21 @@ import Breadcrumbs from './components/Breadcrumbs';
 import {BrowserRouter} from 'react-router-dom';
 import { Box } from '@material-ui/core';
 import AppRouter from './routes/AppRouter';
+import { MuiThemeProvider, CssBaseline } from '@material-ui/core';
+import theme from './theme';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Navbar />
-      <Box paddingTop={"70px"}>
-        <Breadcrumbs />
-        <AppRouter />
-      </Box>
-    </BrowserRouter>
+    <MuiThemeProvider theme={theme}>
+      <CssBaseline />
+      <BrowserRouter>
+        <Navbar />
+        <Box paddingTop={"70px"}>
+          <Breadcrumbs />
+          <AppRouter />
+        </Box>
+      </BrowserRouter>
+    </MuiThemeProvider>
   );
 }
 

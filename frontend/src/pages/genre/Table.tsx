@@ -12,11 +12,11 @@ const columnDefinitions: MUIDataTableColumn[] =[
     {
         name: "categories",
         label: "Categorias",
-        options: {
-            customBodyRender(value, tableMeta, updateValue){
-                return value.map(value => value.name).join(', ');
-            }
-        }
+        // options: {
+        //     customBodyRender: (value, tableMeta, updateValue) => {
+        //         return value.map(v => v.name).join(', ');
+        //     }
+        // }
     },
     {
         name: "created_at",
