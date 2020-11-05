@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import categoryHttp from '../../utils/http/category-http';
 import * as yup from '../../utils/vendor/yup';
 import { useParams, useHistory } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -46,6 +47,7 @@ const useYupValidationResolver = validationSchema =>
   );
 
 const Form: React.FC = () => {
+    const snackbar = useSnackbar();
     const classes = useStyles();
     const history = useHistory();
     const validationSchema = useMemo(
@@ -101,6 +103,10 @@ const Form: React.FC = () => {
         : categoryHttp.update(category.id, formData);
 
         http.then(res => {
+          snackbar.enqueueSnackbar(
+            'Categoria salva com sucesso',
+            {variant: 'success'}
+          )
          setTimeout(() => {
           event ? (
             id
@@ -108,7 +114,13 @@ const Form: React.FC = () => {
               : history.push(`/categories/${res.data.data.id}/edit`)
           ) 
             : history.push('/categories')
-         });
+         })
+         }).catch((error) => {
+          console.log(error);
+          snackbar.enqueueSnackbar(
+           'Erro ao salvar a categoria',
+           {variant: 'error'}
+         );
         }).finally(() => setLoading(false));
     }
   return (
