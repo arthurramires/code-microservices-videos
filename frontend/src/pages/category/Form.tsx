@@ -4,7 +4,7 @@ import {ButtonProps} from '@material-ui/core/Button';
 import { useForm } from 'react-hook-form';
 import categoryHttp from '../../utils/http/category-http';
 import * as yup from '../../utils/vendor/yup';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -47,6 +47,7 @@ const useYupValidationResolver = validationSchema =>
 
 const Form: React.FC = () => {
     const classes = useStyles();
+    const history = useHistory();
     const validationSchema = useMemo(
       () =>
         yup.object({
@@ -99,7 +100,16 @@ const Form: React.FC = () => {
         ? categoryHttp.create(formData)
         : categoryHttp.update(category.id, formData);
 
-        http.then(res => console.log(res)).finally(() => setLoading(false));
+        http.then(res => {
+         setTimeout(() => {
+          event ? (
+            id
+              ? history.replace(`/categories/${res.data.data.id}/edit`)
+              : history.push(`/categories/${res.data.data.id}/edit`)
+          ) 
+            : history.push('/categories')
+         });
+        }).finally(() => setLoading(false));
     }
   return (
       <form onSubmit={handleSubmit(onSubmit)}>
