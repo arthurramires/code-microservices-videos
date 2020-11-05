@@ -3,7 +3,7 @@ import {Box, Button, Checkbox, TextField, makeStyles, Theme} from '@material-ui/
 import {ButtonProps} from '@material-ui/core/Button';
 import { useForm } from 'react-hook-form';
 import categoryHttp from '../../utils/http/category-http';
-import * as yup from 'yup';
+import * as yup from '../../utils/vendor/yup';
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -38,13 +38,7 @@ const Form: React.FC = () => {
   return (
       <form onSubmit={handleSubmit(onSubmit)}>
           <TextField
-            inputRef={register({ 
-              required: "O campo nome é requerido", 
-              maxLength: {
-                value: 2,
-                message: 'O máximo de caracteres é 2'
-              } 
-            })}
+            inputRef={register}
             name="name"
             label="Nome"
             fullWidth
