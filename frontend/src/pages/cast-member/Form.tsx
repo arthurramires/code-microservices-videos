@@ -1,8 +1,10 @@
-import React, {useEffect} from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import {Box, Button, FormControl, TextField, makeStyles, Theme, FormLabel, RadioGroup, FormControlLabel, Radio} from '@material-ui/core';
 import {ButtonProps} from '@material-ui/core/Button';
 import { useForm } from 'react-hook-form';
 import genreHttp from '../../utils/http/genre-http';
+import * as yup from '../../utils/vendor/yup';
+
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -12,9 +14,50 @@ const useStyles = makeStyles((theme: Theme) => {
     }
 });
 
+const useYupValidationResolver = validationSchema =>
+  useCallback(
+    async data => {
+      try {
+        const values = await validationSchema.validate(data, {
+          abortEarly: false
+        });
+
+        return {
+          values,
+          errors: {}
+        };
+      } catch (errors) {
+        return {
+          values: {},
+          errors: errors.inner.reduce(
+            (allErrors, currentError) => ({
+              ...allErrors,
+              [currentError.path]: {
+                type: currentError.type ?? "validation",
+                message: currentError.message
+              }
+            }),
+            {}
+          )
+        };
+      }
+    },
+    [validationSchema]
+  );
+
 const Form: React.FC = () => {
+    const validationSchema = useMemo(
+      () =>
+        yup.object({
+          name: yup.string().required(),
+        }),
+      []
+    );
     const classes = useStyles();
-    const { register, handleSubmit, getValues, setValue } = useForm();
+    const resolver = useYupValidationResolver(validationSchema);
+    const { register, handleSubmit, getValues, setValue, errors } = useForm({
+      resolver
+    });
     const buttonProps: ButtonProps = {
         className: classes.submit,
         variant: "contained",
@@ -37,6 +80,8 @@ const Form: React.FC = () => {
             label="Nome"
             fullWidth
             variant="outlined"
+            error={errors.name !== undefined}
+            helperText={errors.name && errors.name.message}
           />
           <FormControl margin="normal"> 
               <FormLabel component="legend">Tipo</FormLabel>

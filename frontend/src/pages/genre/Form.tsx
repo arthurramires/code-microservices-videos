@@ -1,9 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import {Box, Button, TextField, makeStyles, Theme, MenuItem} from '@material-ui/core';
 import {ButtonProps} from '@material-ui/core/Button';
 import { useForm } from 'react-hook-form';
 import castMemberHttp from '../../utils/http/cast-member-http';
 import categoryHttp from '../../utils/http/category-http';
+import * as yup from '../../utils/vendor/yup';
+
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -13,10 +15,50 @@ const useStyles = makeStyles((theme: Theme) => {
     }
 });
 
+const useYupValidationResolver = validationSchema =>
+  useCallback(
+    async data => {
+      try {
+        const values = await validationSchema.validate(data, {
+          abortEarly: false
+        });
+
+        return {
+          values,
+          errors: {}
+        };
+      } catch (errors) {
+        return {
+          values: {},
+          errors: errors.inner.reduce(
+            (allErrors, currentError) => ({
+              ...allErrors,
+              [currentError.path]: {
+                type: currentError.type ?? "validation",
+                message: currentError.message
+              }
+            }),
+            {}
+          )
+        };
+      }
+    },
+    [validationSchema]
+  );
+
 const Form: React.FC = () => {
     const classes = useStyles();
     const [categories, setCategories] = useState<any[]>([]);
-    const { register, handleSubmit, getValues, watch, setValue } = useForm({
+    const validationSchema = useMemo(
+      () =>
+        yup.object({
+          name: yup.string().required(),
+        }),
+      []
+    );
+    const resolver = useYupValidationResolver(validationSchema);
+    const { register, handleSubmit, getValues, watch, setValue, errors } = useForm({
+      resolver,
       defaultValues: {
         categories_id: []
       }
@@ -54,6 +96,8 @@ const Form: React.FC = () => {
             label="Nome"
             fullWidth
             variant="outlined"
+            error={errors.name !== undefined}
+            helperText={errors.name && errors.name.message}
           />
           <TextField
             select

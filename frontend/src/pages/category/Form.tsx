@@ -1,9 +1,10 @@
-import React from 'react';
-import {Box, Button, Checkbox, TextField, makeStyles, Theme} from '@material-ui/core';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import {Box, Button, Checkbox, TextField, makeStyles, Theme, FormControlLabel} from '@material-ui/core';
 import {ButtonProps} from '@material-ui/core/Button';
 import { useForm } from 'react-hook-form';
 import categoryHttp from '../../utils/http/category-http';
 import * as yup from '../../utils/vendor/yup';
+import { useParams } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -13,18 +14,78 @@ const useStyles = makeStyles((theme: Theme) => {
     }
 })
 
-const validationSchema = yup.object().shape({
-  name: yup.string().required(),
-});
+const useYupValidationResolver = validationSchema =>
+  useCallback(
+    async data => {
+      try {
+        const values = await validationSchema.validate(data, {
+          abortEarly: false
+        });
+
+        return {
+          values,
+          errors: {}
+        };
+      } catch (errors) {
+        return {
+          values: {},
+          errors: errors.inner.reduce(
+            (allErrors, currentError) => ({
+              ...allErrors,
+              [currentError.path]: {
+                type: currentError.type ?? "validation",
+                message: currentError.message
+              }
+            }),
+            {}
+          )
+        };
+      }
+    },
+    [validationSchema]
+  );
 
 const Form: React.FC = () => {
     const classes = useStyles();
-    const { register, handleSubmit, getValues, errors } = useForm({
-        validationSchema,
-        defaultValues: {
-            is_active: true
-        }
+    const validationSchema = useMemo(
+      () =>
+        yup.object({
+          name: yup.string().required(),
+        }),
+      []
+    );
+    const resolver = useYupValidationResolver(validationSchema);
+    const { 
+        register, 
+        handleSubmit, 
+        getValues, 
+        errors, 
+        reset, 
+        watch, 
+        setValue 
+      } = useForm({ resolver });
+
+    const { id } = useParams();
+    const [category, setCategory] = useState<{id: string | null}>({
+      id: null
     });
+
+    useEffect(() => {
+      if(!id){
+        return;
+      }
+
+      categoryHttp.get(id).then(response => {
+        setCategory(response.data.data)
+        reset(response.data.data)
+      });
+
+    }, []);
+
+    useEffect(() => {
+      register({name: "is_active"})
+    }, [register]);
+
     const buttonProps: ButtonProps = {
         className: classes.submit,
         size: "medium",
@@ -33,7 +94,11 @@ const Form: React.FC = () => {
     }
 
     function onSubmit(formData, event){
-        categoryHttp.create(formData).then((response) => console.log(response));
+      const http = !category
+        ? categoryHttp.create(formData)
+        : categoryHttp.update(category.id, formData);
+
+        http.then(res => console.log(res));
     }
   return (
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -45,6 +110,7 @@ const Form: React.FC = () => {
             variant="outlined"
             error={errors.name !== undefined}
             helperText={errors.name && errors.name.message}
+            InputLabelProps={{ shrink: true }}
           />
           <TextField
             inputRef={register}
@@ -55,14 +121,21 @@ const Form: React.FC = () => {
             fullWidth
             variant="outlined"
             margin="normal"
+            InputLabelProps={{ shrink: true }}
           />
 
-          <Checkbox
-            inputRef={register} 
-            name="is_active"
-            defaultChecked
-          />
-          Ativo?
+          <FormControlLabel 
+            control={
+              <Checkbox
+                name="is_active"
+                color="primary"
+                onChange={() => setValue('is_active', getValues()['is_active'])}
+                checked={watch('is_active')}
+              />
+            }
+            label="Ativo?"
+            labelPlacement="end"
+          />          
           <Box dir="rtl">
             <Button   
               {...buttonProps} 
