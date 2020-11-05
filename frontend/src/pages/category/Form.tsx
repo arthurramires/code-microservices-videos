@@ -66,19 +66,18 @@ const Form: React.FC = () => {
       } = useForm({ resolver });
 
     const { id } = useParams();
-    const [category, setCategory] = useState<{id: string | null}>({
-      id: null
-    });
+    const [category, setCategory] = useState<{id: string } | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
       if(!id){
         return;
       }
-
+      setLoading(true);
       categoryHttp.get(id).then(response => {
         setCategory(response.data.data)
         reset(response.data.data)
-      });
+      }).finally(() => setLoading(false));
 
     }, []);
 
@@ -90,15 +89,17 @@ const Form: React.FC = () => {
         className: classes.submit,
         size: "medium",
         variant: "contained",
-        color: 'secondary'
+        color: 'secondary',
+        disabled: loading
     }
 
     function onSubmit(formData, event){
+      setLoading(true);
       const http = !category
         ? categoryHttp.create(formData)
         : categoryHttp.update(category.id, formData);
 
-        http.then(res => console.log(res));
+        http.then(res => console.log(res)).finally(() => setLoading(false));
     }
   return (
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -111,6 +112,7 @@ const Form: React.FC = () => {
             error={errors.name !== undefined}
             helperText={errors.name && errors.name.message}
             InputLabelProps={{ shrink: true }}
+            disabled={loading}
           />
           <TextField
             inputRef={register}
@@ -122,9 +124,11 @@ const Form: React.FC = () => {
             variant="outlined"
             margin="normal"
             InputLabelProps={{ shrink: true }}
+            disabled={loading}
           />
 
-          <FormControlLabel 
+          <FormControlLabel
+            disabled={loading} 
             control={
               <Checkbox
                 name="is_active"
