@@ -3,6 +3,7 @@ import MUIDataTable, { MUIDataTableColumn } from 'mui-datatables';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import castMemberHttp from '../../utils/http/cast-member-http';
+import { CastMember, ListResponse } from '../../utils/models';
 
 const CastMemberTypeMap = {
     1: 'Diretor',
@@ -35,10 +36,21 @@ const columnDefinitions: MUIDataTableColumn[] =[
 ];
 
 const Table: React.FC = () => {
-    const [castMembers, setCastMembers] = useState([]);
+    const [castMembers, setCastMembers] = useState<CastMember[]>([]);
 
-    useEffect(() => {        
-        castMemberHttp.list().then(({ data }) => setCastMembers(data.data));
+    useEffect(() => {
+        let isCancelled = false;
+
+        (async function getCategories(){
+            const { data } = await  castMemberHttp.list<ListResponse<CastMember>>();
+            if(!isCancelled){
+                setCastMembers(data.data);
+            }
+        })();
+        
+        return () => {
+            isCancelled = true;
+        }
     }, []);
   return (
       <MUIDataTable

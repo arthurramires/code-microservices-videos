@@ -15,6 +15,7 @@ if [ ! -f ".env.testing" ]; then
     cp .env.testing.example .env.testing
 fi
 chown -R www-data:www-data .
+composer require fruitcake/laravel-cors
 composer install
 php artisan key:generate
 php artisan migrate

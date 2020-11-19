@@ -2,18 +2,14 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import {Box, Button, TextField, makeStyles, Theme, MenuItem} from '@material-ui/core';
 import {ButtonProps} from '@material-ui/core/Button';
 import { useForm } from 'react-hook-form';
-import castMemberHttp from '../../utils/http/cast-member-http';
+import { useParams, useHistory } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 import categoryHttp from '../../utils/http/category-http';
 import * as yup from '../../utils/vendor/yup';
-
-
-const useStyles = makeStyles((theme: Theme) => {
-    return {
-        submit: {
-            margin: theme.spacing(1),
-        }
-    }
-});
+import genreHttp from '../../utils/http/genre-http';
+import { Genre } from '../../utils/models';
+import SubmitActions from '../../components/SubmitActions';
+import DefaultForm from '../../components/DefaultForm';
 
 const useYupValidationResolver = validationSchema =>
   useCallback(
@@ -47,8 +43,13 @@ const useYupValidationResolver = validationSchema =>
   );
 
 const Form: React.FC = () => {
-    const classes = useStyles();
     const [categories, setCategories] = useState<any[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [genre, setGenre] = useState<Genre | null>(null);
+    const { id } = useParams();
+    const snackbar = useSnackbar();
+    const history = useHistory();
+
     const validationSchema = useMemo(
       () =>
         yup.object({
@@ -57,7 +58,7 @@ const Form: React.FC = () => {
       []
     );
     const resolver = useYupValidationResolver(validationSchema);
-    const { register, handleSubmit, getValues, watch, setValue, errors } = useForm({
+    const { register, handleSubmit, getValues, watch, setValue, errors, reset, trigger } = useForm({
       resolver,
       defaultValues: {
         categories_id: []
@@ -65,15 +66,32 @@ const Form: React.FC = () => {
     });
     const category = getValues()['categories_id'];
 
-    const buttonProps: ButtonProps = {
-        className: classes.submit,
-        size: "medium",
-        variant: "contained",
-        color: 'secondary'
-    }
-
     function onSubmit(formData, event){
-      castMemberHttp.create(formData).then((response) => console.log(response));
+      setLoading(true);
+      const http = !genre
+        ? genreHttp.create(formData)
+        : genreHttp.update(genre.id, formData);
+
+        http.then(res => {
+          snackbar.enqueueSnackbar(
+            'Gênero salvo com sucesso',
+            {variant: 'success'}
+          )
+         setTimeout(() => {
+          event ? (
+            id
+              ? history.replace(`/genres/${res.data.data.id}/edit`)
+              : history.push(`/genres/${res.data.data.id}/edit`)
+          ) 
+            : history.push('/genres')
+         })
+         }).catch((error) => {
+          console.log(error);
+          snackbar.enqueueSnackbar(
+           'Erro ao salvar o gênero',
+           {variant: 'error'}
+         );
+        }).finally(() => setLoading(false));
     }
 
     useEffect(() => {
@@ -81,7 +99,31 @@ const Form: React.FC = () => {
     }, [register]);
 
     useEffect(() => {
-      categoryHttp.list().then(response => setCategories(response.data.data))
+      async function loadData(){
+        setLoading(true);
+        const promises = [categoryHttp.list()];
+
+        if(!id){
+          promises.push(genreHttp.get(id));
+        }
+        try{
+          const [categoriesResponse, genreResponse] = await Promise.all(promises);
+          setCategories(categoriesResponse.data.data);
+          if(id){
+            setGenre(genreResponse.data.data);
+            reset({
+              ...genreResponse.data.data,
+              categories_id: genreResponse.data.data.categories.map(category => category.id)
+            });
+          }
+        }catch(error){
+          console.log(error);
+        }finally {
+          setLoading(false)
+        }
+      }
+
+      loadData();
     }, []);
 
     const handleChange = (e) => {
@@ -89,7 +131,7 @@ const Form: React.FC = () => {
     }
 
   return (
-      <form onSubmit={handleSubmit(onSubmit)}>
+    <DefaultForm GridItemProps={{ xs: 12, md: 6 }} onSubmit={handleSubmit(onSubmit)}>
           <TextField
             inputRef={register}
             name="name"
@@ -121,11 +163,12 @@ const Form: React.FC = () => {
             ))}
           </TextField>
 
-          <Box dir="rtl">
-            <Button {...buttonProps} onClick={() => onSubmit(getValues(), null)} >Salvar</Button>
-            <Button {...buttonProps} type="submit">Salvar e continuar editando</Button>
-          </Box>
-      </form>
+          <SubmitActions disableButtons={loading} handleSave={() => 
+            trigger().then(isValid => {
+              isValid && onSubmit(getValues(), null)
+            }) 
+          }/>
+      </DefaultForm>
   );
 }
 

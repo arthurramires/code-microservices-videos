@@ -3,6 +3,7 @@ import MUIDataTable, { MUIDataTableColumn } from 'mui-datatables';
 import genreHttp from '../../utils/http/genre-http';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
+import { Genre, ListResponse } from '../../utils/models';
 
 const columnDefinitions: MUIDataTableColumn[] =[
     {
@@ -30,10 +31,21 @@ const columnDefinitions: MUIDataTableColumn[] =[
 ];
 
 const Table: React.FC = () => {
-    const [genres, setGenres] = useState([]);
+    const [genres, setGenres] = useState<Genre[]>([]);
 
     useEffect(() => {
-        genreHttp.list().then(({ data }) => setGenres(data.data));
+        let isCancelled = false;
+
+        (async () => {
+            const { data } = await genreHttp.list<ListResponse<Genre>>();
+            if(!isCancelled){
+                setGenres(data.data)
+            }
+        })();
+
+        return () => {
+            isCancelled = true;
+        }
     }, []);
   return (
       <MUIDataTable

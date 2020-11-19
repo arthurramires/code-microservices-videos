@@ -4,6 +4,7 @@ import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import categoryHttp from '../../utils/http/category-http';
 import {BadgeYes, BadgeNo} from '../../components/Badge';
+import { Category, ListResponse } from '../../utils/models';
 
 const columnDefinitions: MUIDataTableColumn[] =[
     {
@@ -30,16 +31,21 @@ const columnDefinitions: MUIDataTableColumn[] =[
     },
 ];
 
-interface CategoryProps{
-    id: string;
-    name: string;
-}
-
 const Table: React.FC = () => {
-    const [categories, setCategories] = useState<CategoryProps[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
 
     useEffect(() => {
-        categoryHttp.list<{ data: CategoryProps[] }>().then(({ data }) => setCategories(data.data));
+        let isCancelled = false;
+        (async () => {
+            const { data } = await categoryHttp.list<ListResponse<Category>>();
+            if(!isCancelled){
+                setCategories(data.data)
+            }
+        })();
+
+        return () => {
+            isCancelled = true;
+        }
     }, []);
   return (
       <MUIDataTable
