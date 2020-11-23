@@ -1,6 +1,6 @@
 import React from 'react';
 import MUIDataTable, {MUIDataTableColumn, MUIDataTableOptions, MUIDataTableProps} from 'mui-datatables';
-import {createMuiTheme, MuiThemeProvider, useTheme, Theme} from '@material-ui/core';
+import {useMediaQuery, MuiThemeProvider, useTheme, Theme} from '@material-ui/core';
 import {merge, omit, cloneDeep} from 'lodash';
 
 export interface TableColumn extends MUIDataTableColumn{
@@ -67,6 +67,10 @@ const Table: React.FC<TableProps> = (props) => {
         });
     }
 
+    function applyResponsive(){
+        newProps.options.responsive = isSmOrDown ? 'scrollMaxHeight' : 'stacked';
+    }
+
     function applyLoading(){
         const textLabels = (newProps.options as any).textLabels;
         textLabels.body.noMatch = 
@@ -78,12 +82,14 @@ const Table: React.FC<TableProps> = (props) => {
     }
 
     const theme = cloneDeep<Theme>(useTheme());
+    const isSmOrDown = useMediaQuery(theme.breakpoints.doen('sm'));
 
     const newProps = merge({options: cloneDeep(defaultOptions)}, props, {
         columns: extractMuiDatableColumns(props.columns),
     });
 
     applyLoading();
+    applyResponsive();
 
     const originalProps = getOriginalMuiDataTableProps();
 
