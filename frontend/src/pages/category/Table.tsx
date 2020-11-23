@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import { MUIDataTableColumn } from 'mui-datatables';
 import format from 'date-fns/format';
+import { useSnackbar } from 'notistack';
 import parseISO from 'date-fns/parseISO';
 import categoryHttp from '../../utils/http/category-http';
 import {BadgeYes, BadgeNo} from '../../components/Badge';
@@ -50,13 +50,26 @@ const columnDefinitions: TableColumn[] = [
 
 const Table: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const snackbar = useSnackbar();
 
     useEffect(() => {
         let isCancelled = false;
         (async () => {
-            const { data } = await categoryHttp.list<ListResponse<Category>>();
-            if(!isCancelled){
-                setCategories(data.data)
+            setLoading(true);
+            try {
+                const { data } = await categoryHttp.list<ListResponse<Category>>();
+                if(!isCancelled){
+                    setCategories(data.data)
+                }
+            }catch (error){
+                console.log(error);
+                snackbar.enqueueSnackbar(
+                 'Erro ao salvar o gênero',
+                 {variant: 'error'}
+               );
+            }finally {
+                setLoading(false);
             }
         })();
 
@@ -69,6 +82,7 @@ const Table: React.FC = () => {
         title="Listagem de categorias" 
         columns={columnDefinitions}
         data={categories}
+        isLoading={loading}
     />
   );
 }

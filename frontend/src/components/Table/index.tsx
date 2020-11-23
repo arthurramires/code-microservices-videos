@@ -47,6 +47,7 @@ const defaultOptions: MUIDataTableOptions = {
 
 interface TableProps extends MUIDataTableProps {
     columns: TableColumn[];
+    isLoading?: boolean;
 }
 
 const Table: React.FC<TableProps> = (props) => {
@@ -66,16 +67,29 @@ const Table: React.FC<TableProps> = (props) => {
         });
     }
 
+    function applyLoading(){
+        const textLabels = (newProps.options as any).textLabels;
+        textLabels.body.noMatch = 
+            newProps.isLoading === true ? 'Carregando...' : textLabels.body.noMatch
+    }
+
+    function getOriginalMuiDataTableProps(){
+        return omit(newProps, 'isLoading');
+    }
+
     const theme = cloneDeep<Theme>(useTheme());
 
-    const newProps = merge({options: defaultOptions}, props, {
+    const newProps = merge({options: cloneDeep(defaultOptions)}, props, {
         columns: extractMuiDatableColumns(props.columns),
     });
 
+    applyLoading();
+
+    const originalProps = getOriginalMuiDataTableProps();
 
   return (
       <MuiThemeProvider theme={theme}>
-            <MUIDataTable {...newProps}/>
+            <MUIDataTable {...originalProps}/>
       </MuiThemeProvider>
   );
 }
