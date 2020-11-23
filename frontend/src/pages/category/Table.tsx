@@ -1,16 +1,25 @@
 import React, {useEffect, useState} from 'react';
-import MUIDataTable, { MUIDataTableColumn } from 'mui-datatables';
+import { MUIDataTableColumn } from 'mui-datatables';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import categoryHttp from '../../utils/http/category-http';
 import {BadgeYes, BadgeNo} from '../../components/Badge';
-import DefaultTable from '../../components/Table';
+import DefaultTable, {TableColumn} from '../../components/Table';
 import { Category, ListResponse } from '../../utils/models';
 
-const columnDefinitions: MUIDataTableColumn[] =[
+const columnDefinitions: TableColumn[] = [
+    {
+        name: 'id',
+        label: 'ID',
+        width: '30%',
+        options: {
+            sort: false
+        }
+    },
     {
         name: "name",
-        label: "Nome"
+        label: "Nome",
+        width: "43%"
     },
     {
         name: "is_active",
@@ -19,17 +28,24 @@ const columnDefinitions: MUIDataTableColumn[] =[
             customBodyRender(value, tableMeta, updateValue){
                 return value ? <BadgeYes /> : <BadgeNo />;
             }
-        }
+        },
+        width: "4%"
     },
     {
         name: "created_at",
         label: "Criado em:",
+        width: "10%",
         options: {
             customBodyRender(value, tableMeta, updateValue){
             return <span>{format(parseISO(value), 'dd/MM/yyyy')}</span>;
             }
         }
     },
+    {
+        name: 'actions',
+        label: 'Ações',
+        width: '13%'
+    }
 ];
 
 const Table: React.FC = () => {

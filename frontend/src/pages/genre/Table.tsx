@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import MUIDataTable, { MUIDataTableColumn } from 'mui-datatables';
+import { MUIDataTableColumn } from 'mui-datatables';
 import genreHttp from '../../utils/http/genre-http';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import { Genre, ListResponse } from '../../utils/models';
+import DefaultTable from '../../components/Table';
 
 const columnDefinitions: MUIDataTableColumn[] =[
     {
@@ -48,7 +49,7 @@ const Table: React.FC = () => {
         }
     }, []);
   return (
-      <MUIDataTable
+      <DefaultTable
         title="Listagem de gêneros" 
         columns={columnDefinitions}
         data={genres}
