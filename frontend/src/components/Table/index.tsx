@@ -101,3 +101,19 @@ const Table: React.FC<TableProps> = (props) => {
 }
 
 export default Table;
+
+
+export function makeActionsStyle(column){
+
+    return theme => {
+        const copyTheme = cloneDeep(theme);
+        const selector = `&[data-testid^="MuiDataTableBodyCell-${column}"]`;
+
+        (copyTheme.overrides as any).MUIDataTableBodyCell.root[selector] = {
+            paddingTop: '0px',
+            paddignBottom: '0px',
+        }
+        return copyTheme
+    }
+    
+}

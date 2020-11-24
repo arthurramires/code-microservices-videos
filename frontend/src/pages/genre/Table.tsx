@@ -4,9 +4,12 @@ import genreHttp from '../../utils/http/genre-http';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import { Genre, ListResponse } from '../../utils/models';
-import DefaultTable from '../../components/Table';
+import DefaultTable, {TableColumn, makeActionsStyle} from '../../components/Table';
+import {useMediaQuery, MuiThemeProvider, useTheme, IconButton} from '@material-ui/core';
+import {Link} from 'react-router-dom';
+import {Edit} from '@material-ui/icons';
 
-const columnDefinitions: MUIDataTableColumn[] =[
+const columnDefinitions: TableColumn[] =[
     {
         name: "name",
         label: "Nome"
@@ -29,6 +32,27 @@ const columnDefinitions: MUIDataTableColumn[] =[
             }
         }
     },
+    {
+        name: 'actions',
+        label: 'Ações',
+        width: '13%',
+        options: {
+            sort: false,
+            customBodyRender: (value, tableMeta) => {
+                return (
+                    <span>
+                        <IconButton
+                            color={'secondary'}
+                            component={Link}
+                            to={`/genres/${tableMeta.rowData[0]}/edit`}
+                        >
+                            <Edit fontSize={"inherit"} />
+                        </IconButton>
+                    </span>
+                );
+            }
+        }
+    }
 ];
 
 const Table: React.FC = () => {
@@ -49,11 +73,13 @@ const Table: React.FC = () => {
         }
     }, []);
   return (
+    <MuiThemeProvider theme={makeActionsStyle(columnDefinitions.length-1)}>
       <DefaultTable
         title="Listagem de gêneros" 
         columns={columnDefinitions}
         data={genres}
     />
+    </MuiThemeProvider>
   );
 }
 

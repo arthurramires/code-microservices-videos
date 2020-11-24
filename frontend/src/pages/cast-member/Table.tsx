@@ -4,14 +4,17 @@ import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import castMemberHttp from '../../utils/http/cast-member-http';
 import { CastMember, ListResponse } from '../../utils/models';
-import DefaultTable from '../../components/Table';
+import DefaultTable, {TableColumn, makeActionsStyle} from '../../components/Table';
+import {useMediaQuery, MuiThemeProvider, useTheme, IconButton} from '@material-ui/core';
+import {Link} from 'react-router-dom';
+import {Edit} from '@material-ui/icons';
 
 const CastMemberTypeMap = {
     1: 'Diretor',
     2: 'Ator'
 };
 
-const columnDefinitions: MUIDataTableColumn[] =[
+const columnDefinitions: TableColumn[] =[
     {
         name: "name",
         label: "Nome"
@@ -34,6 +37,27 @@ const columnDefinitions: MUIDataTableColumn[] =[
             }
         }
     },
+    {
+        name: 'actions',
+        label: 'Ações',
+        width: '13%',
+        options: {
+            sort: false,
+            customBodyRender: (value, tableMeta) => {
+                return (
+                    <span>
+                        <IconButton
+                            color={'secondary'}
+                            component={Link}
+                            to={`/cast-members/${tableMeta.rowData[0]}/edit`}
+                        >
+                            <Edit fontSize={"inherit"} />
+                        </IconButton>
+                    </span>
+                );
+            }
+        }
+    }
 ];
 
 const Table: React.FC = () => {
@@ -54,11 +78,13 @@ const Table: React.FC = () => {
         }
     }, []);
   return (
+    <MuiThemeProvider theme={makeActionsStyle(columnDefinitions.length-1)}>
       <DefaultTable
         title="Listagem de membros de elencos" 
         columns={columnDefinitions}
         data={castMembers}
     />
+    </MuiThemeProvider>
   );
 }
 
