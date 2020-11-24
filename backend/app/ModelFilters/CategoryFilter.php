@@ -4,9 +4,9 @@ namespace App\ModelFilters;
 
 use EloquentFilter\ModelFilter;
 
-class CategoryFilter extends ModelFilter
+class CategoryFilter extends DefaultModelFilter
 {
-    public $relations = [];
+    protected $sortable = ['name', 'is_active', 'created_at'];
 
     public function search($search)
     {
