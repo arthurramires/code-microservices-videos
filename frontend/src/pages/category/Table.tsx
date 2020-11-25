@@ -16,9 +16,15 @@ interface Pagination{
     total: number;
     per_page: number;
 }
+
+interface Order {
+    sort: string | null;
+    dir: string | null;
+}
 interface SearchState {
     search: string;
     pagination: Pagination;
+    order: Order;
 }
 
 
@@ -90,9 +96,28 @@ const Table: React.FC = () => {
             page: 1,
             total: 0,
             per_page: 10,
+        },
+        order: {
+            sort: null,
+            dir: null,
         } 
     });
     const snackbar = useSnackbar();
+
+    const columns = columnDefinitions.map(column => {
+        if(){
+            (column.options as any).sortDirection = searchState.order.dir
+        }
+
+        return column.name === searchState.order.sort 
+            ? {
+                ...column,
+                options: {
+                    ...column.options,
+                    sortDirection: searchState.order.dir as any
+                }
+            } : column;
+    });
   
     useEffect(() => {
         subscribed.current = true;
@@ -101,7 +126,7 @@ const Table: React.FC = () => {
         return () => {
             subscribed.current = false;
         }
-    }, [searchState.search, searchState.pagination.page, searchState.pagination.per_page]);
+    }, [searchState.search, searchState.pagination.page, searchState.pagination.per_page, searchState.order]);
 
     async function getData(){
         setLoading(true);
@@ -110,7 +135,9 @@ const Table: React.FC = () => {
                 queryParams: {
                     search: searchState.search,
                     page: searchState.pagination.page,
-                    per_page: searchState.pagination.per_page
+                    per_page: searchState.pagination.per_page,
+                    sort: searchState.order.sort,
+                    dir: searchState.order.dir
                 }
              });
             if(subscribed.current){
@@ -136,7 +163,7 @@ const Table: React.FC = () => {
       <MuiThemeProvider theme={makeActionsStyle(columnDefinitions.length-1)}>
         <DefaultTable
             title="Listagem de categorias" 
-            columns={columnDefinitions}
+            columns={columns}
             data={categories}
             isLoading={loading}
             options={{
@@ -162,6 +189,13 @@ const Table: React.FC = () => {
                     pagination: {
                         ...prevState.pagination,
                         per_page,
+                    }
+                }))),
+                onColumnSortChange: (changeColumn: string, direction: string) => setSearchState((prevState => ({
+                    ...prevState,
+                    order: {
+                        sort: changeColumn,
+                        dir: direction.includes('desc') ? 'desc' : 'asc',
                     }
                 }))),
             }}
