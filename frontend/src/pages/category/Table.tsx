@@ -11,9 +11,17 @@ import DefaultTable, {TableColumn, makeActionsStyle} from '../../components/Tabl
 import { Category, ListResponse } from '../../utils/models';
 import {merge, omit, cloneDeep} from 'lodash';
 
+interface Pagination{
+    page: number;
+    total: number;
+    per_page: number;
+}
 interface SearchState {
     search: string;
+    pagination: Pagination;
 }
+
+
 
 const columnDefinitions: TableColumn[] = [
     {
@@ -76,7 +84,14 @@ const Table: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([]);
     const subscribed = useRef(true);
     const [loading, setLoading] = useState<boolean>(false);
-    const [searchState, setSearchState] = useState<SearchState>({ search: '' });
+    const [searchState, setSearchState] = useState<SearchState>({ 
+        search: '', 
+        pagination: {
+            page: 1,
+            total: 0,
+            per_page: 10,
+        } 
+    });
     const snackbar = useSnackbar();
   
     useEffect(() => {
@@ -86,18 +101,26 @@ const Table: React.FC = () => {
         return () => {
             subscribed.current = false;
         }
-    }, [searchState]);
+    }, [searchState.search, searchState.pagination.page, searchState.pagination.per_page]);
 
     async function getData(){
         setLoading(true);
         try {
             const { data } = await categoryHttp.list<ListResponse<Category>>({ 
                 queryParams: {
-                    search: searchState.search
+                    search: searchState.search,
+                    page: searchState.pagination.page,
+                    per_page: searchState.pagination.per_page
                 }
              });
             if(subscribed.current){
-                setCategories(data.data)
+                setCategories(data.data);
+                setSearchState((prevState) => ({
+                    ...prevState,
+                    pagination: {
+                        total: data.meta.total
+                    }
+                }));
             }
         }catch (error){
             console.log(error);
@@ -117,9 +140,30 @@ const Table: React.FC = () => {
             data={categories}
             isLoading={loading}
             options={{
+                serverSide: true,
                 responsive: "standard",
                 searchText: searchState.search,
-                onSearchChange: (value) => setSearchState({ search: value }) 
+                page: searchState.pagination.page - 1,
+                count: searchState.pagination.total,
+                rowsPerPage: searchState.pagination.per_page,
+                onSearchChange: (value) => setSearchState((prevState => ({
+                    ...prevState,
+                    search: value
+                }))),
+                onChangePage: (page) => setSearchState((prevState => ({
+                    ...prevState,
+                    pagination: {
+                        ...prevState.pagination,
+                        page: page + 1,
+                    }
+                }))),
+                onChangeRowsPerPage: (per_page) => setSearchState((prevState => ({
+                    ...prevState,
+                    pagination: {
+                        ...prevState.pagination,
+                        per_page,
+                    }
+                }))),
             }}
         />
     </MuiThemeProvider>
