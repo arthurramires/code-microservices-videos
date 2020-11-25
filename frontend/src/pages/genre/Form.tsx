@@ -101,7 +101,7 @@ const Form: React.FC = () => {
     useEffect(() => {
       async function loadData(){
         setLoading(true);
-        const promises = [categoryHttp.list(queryParams: { all: '' })];
+        const promises = [categoryHttp.list({queryParams: { all: '' }})];
 
         if(!id){
           promises.push(genreHttp.get(id));
