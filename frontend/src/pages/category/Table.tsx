@@ -9,8 +9,6 @@ import categoryHttp from '../../utils/http/category-http';
 import {BadgeYes, BadgeNo} from '../../components/Badge';
 import DefaultTable, {TableColumn, makeActionsStyle} from '../../components/Table';
 import { Category, ListResponse } from '../../utils/models';
-import {merge, omit, cloneDeep} from 'lodash';
-
 interface Pagination{
     page: number;
     total: number;
@@ -151,6 +149,9 @@ const Table: React.FC = () => {
             }
         }catch (error){
             console.log(error);
+            if(categoryHttp.isCancelRequest(error)){
+                return;
+            }
             snackbar.enqueueSnackbar(
              'Erro ao salvar o gênero',
              {variant: 'error'}
