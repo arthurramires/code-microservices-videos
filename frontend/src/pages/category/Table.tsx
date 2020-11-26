@@ -10,6 +10,7 @@ import {BadgeYes, BadgeNo} from '../../components/Badge';
 import DefaultTable, {TableColumn, makeActionsStyle} from '../../components/Table';
 import FilterResetButton from '../../components/Table/FilterResetButton';
 import { Category, ListResponse } from '../../utils/models';
+import reducer, {INITIAL_STATE, Creators, Types} from '../../store/search';
 interface Pagination{
     page: number;
     total: number;
@@ -84,60 +85,6 @@ const columnDefinitions: TableColumn[] = [
         }
     }
 ];
-
-const INITIAL_STATE = { 
-    search: '', 
-    pagination: {
-        page: 1,
-        total: 0,
-        per_page: 10,
-    },
-    order: {
-        sort: null,
-        dir: null,
-    } 
-}
-
-function reducer(state, action){
-    switch (action.type) {
-        case 'search':
-            return {
-                ...state,
-                search: action.search,
-                pagination: {
-                    ...state.pagination,
-                    page: 1
-                }
-            }
-        case 'page':
-            return {
-                ...state,
-                pagination: {
-                    ...state.pagination,
-                    page: action.page,
-                }
-            }
-        case 'per_page':
-            return {
-                ...state,
-                pagination: {
-                    ...state.pagination,
-                    per_page: action.per_page,
-                }
-            }
-        case 'order':
-            return {
-                ...state,
-                order: {
-                    sort: action.sort,
-                    dir: action.dir,
-                }
-            }
-    
-        default:
-            return INITIAL_STATE;
-    }
-}
 
 const Table: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([]);
@@ -219,19 +166,19 @@ const Table: React.FC = () => {
             options={{
                 serverSide: true,
                 responsive: "standard",
-                searchText: searchState.search,
+                searchText: searchState.search as any,
                 page: searchState.pagination.page - 1,
                 count: searchState.pagination.total,
                 rowsPerPage: searchState.pagination.per_page,
                 customToolbar: () => (
                     <FilterResetButton handleClick={() => {
-                        dispatch({ type: 'default' })
+                        //dispatch({ type: 'default' })
                     }}/>
                 ),
-                onSearchChange: (value) => dispatch({ type: 'search', search: value }),
-                onChangePage: (page) => dispatch({ type: 'page', page: page + 1 }),
-                onChangeRowsPerPage: (perPage) => dispatch({ type: 'per_page', per_page: perPage }),
-                onColumnSortChange: (changeColumn: string, direction: string) => dispatch({ type: 'order', sort: changeColumn, dir: direction.includes('desc') ? 'desc' : 'asc' }),
+                onSearchChange: (value) => dispatch(Creators.setSearch({ search: value })),
+                onChangePage: (page) => dispatch(Creators.setPage({ page: page + 1 })),
+                onChangeRowsPerPage: (perPage) => dispatch(Creators.setPerPage({ per_page: perPage })),
+                onColumnSortChange: (changeColumn: string, direction: string) => dispatch(Creators.setOrder({ sort: changeColumn, dir: direction.includes('desc') ? 'desc' : 'asc' })),
             }}
         />
     </MuiThemeProvider>
