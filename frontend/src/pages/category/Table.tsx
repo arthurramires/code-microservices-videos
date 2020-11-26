@@ -11,6 +11,7 @@ import DefaultTable, {TableColumn, makeActionsStyle} from '../../components/Tabl
 import FilterResetButton from '../../components/Table/FilterResetButton';
 import { Category, ListResponse } from '../../utils/models';
 import reducer, {INITIAL_STATE, Creators, Types} from '../../store/filter';
+import useFilter from '../../hooks/useFilter';
 interface Pagination{
     page: number;
     total: number;
@@ -90,8 +91,12 @@ const Table: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([]);
     const subscribed = useRef(true);
     const [loading, setLoading] = useState<boolean>(false);
-    const [totalRecords, setTotalRecords] = useState<number>(0);
-    const [filterState, dispatch] = useReducer(reducer, INITIAL_STATE);
+    const {
+        totalRecords,
+        setTotalRecords,
+        filterState,
+        dispatch
+    } = useFilter();
     const snackbar = useSnackbar();
 
     const columns = columnDefinitions.map(column => {
