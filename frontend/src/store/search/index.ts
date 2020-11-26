@@ -7,23 +7,25 @@ export const { Types, Creators } = createActions<{
     SET_PAGE: string,
     SET_PER_PAGE: string,
     SET_ORDER: string,
+    SET_RESET: string,
 }, {
     setSearch(payload: Typing.SetSearchAction['payload']): Typing.SetSearchAction
     setPage(payload: Typing.SetPageAction['payload']): Typing.SetPageAction
     setPerPage(payload: Typing.SetPerPageAction['payload']): Typing.SetPerPageAction
     setOrder(payload: Typing.SetOrderAction['payload']): Typing.SetOrderAction
+    setReset()
 }>({
     setSearch: ['payload'],
     setPage: ['payload'],
     setPerPage: ['payload'],
     setOrder: ['payload'],
+    setReset: []
 });
 
 export const INITIAL_STATE: Typing.State = { 
     search: '', 
     pagination: {
         page: 1,
-        total: 0,
         per_page: 10,
     },
     order: {
@@ -37,6 +39,7 @@ const reducer = createReducer<Typing.State, Typing.Actions>(INITIAL_STATE, {
     [Types.SET_PAGE]: setPage as any,
     [Types.SET_PER_PAGE]: setPerPage as any,
     [Types.SET_ORDER]: setOrder as any,
+    [Types.SET_RESET]: setReset as any,
 });
 
 export default reducer;
@@ -77,5 +80,9 @@ function setOrder(state = INITIAL_STATE, action: Typing.SetOrderAction): Typing.
             dir: action.payload.dir,
         }
     }
+}
+
+function setReset(state = INITIAL_STATE, action){
+    return { ...INITIAL_STATE, search: { value: null, updated: true } }
 }
 

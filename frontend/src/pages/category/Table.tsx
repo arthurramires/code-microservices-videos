@@ -90,6 +90,7 @@ const Table: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([]);
     const subscribed = useRef(true);
     const [loading, setLoading] = useState<boolean>(false);
+    const [totalRecords, setTotalRecords] = useState<number>(0);
     const [searchState, dispatch] = useReducer(reducer, INITIAL_STATE);
     const snackbar = useSnackbar();
 
@@ -127,6 +128,7 @@ const Table: React.FC = () => {
              });
             if(subscribed.current){
                 setCategories(data.data);
+                setTotalRecords(data.meta.total)
                 // setSearchState((prevState) => ({
                 //     ...prevState,
                 //     pagination: {
@@ -168,11 +170,11 @@ const Table: React.FC = () => {
                 responsive: "standard",
                 searchText: searchState.search as any,
                 page: searchState.pagination.page - 1,
-                count: searchState.pagination.total,
+                count: totalRecords,
                 rowsPerPage: searchState.pagination.per_page,
                 customToolbar: () => (
                     <FilterResetButton handleClick={() => {
-                        //dispatch({ type: 'default' })
+                        dispatch(Creators.setReset())
                     }}/>
                 ),
                 onSearchChange: (value) => dispatch(Creators.setSearch({ search: value })),
