@@ -10,7 +10,7 @@ import {BadgeYes, BadgeNo} from '../../components/Badge';
 import DefaultTable, {TableColumn, makeActionsStyle} from '../../components/Table';
 import FilterResetButton from '../../components/Table/FilterResetButton';
 import { Category, ListResponse } from '../../utils/models';
-import reducer, {INITIAL_STATE, Creators, Types} from '../../store/search';
+import reducer, {INITIAL_STATE, Creators, Types} from '../../store/filter';
 interface Pagination{
     page: number;
     total: number;
@@ -91,16 +91,16 @@ const Table: React.FC = () => {
     const subscribed = useRef(true);
     const [loading, setLoading] = useState<boolean>(false);
     const [totalRecords, setTotalRecords] = useState<number>(0);
-    const [searchState, dispatch] = useReducer(reducer, INITIAL_STATE);
+    const [filterState, dispatch] = useReducer(reducer, INITIAL_STATE);
     const snackbar = useSnackbar();
 
     const columns = columnDefinitions.map(column => {
-        return column.name === searchState.order.sort 
+        return column.name === filterState.order.sort 
             ? {
                 ...column,
                 options: {
                     ...column.options,
-                    sortDirection: searchState.order.dir as any
+                    sortDirection: filterState.order.dir as any
                 }
             } : column;
     });
@@ -112,24 +112,24 @@ const Table: React.FC = () => {
         return () => {
             subscribed.current = false;
         }
-    }, [searchState.search, searchState.pagination.page, searchState.pagination.per_page, searchState.order]);
+    }, [filterState.search, filterState.pagination.page, filterState.pagination.per_page, filterState.order]);
 
     async function getData(){
         setLoading(true);
         try {
             const { data } = await categoryHttp.list<ListResponse<Category>>({ 
                 queryParams: {
-                    search: cleanSearchText(searchState.search),
-                    page: searchState.pagination.page,
-                    per_page: searchState.pagination.per_page,
-                    sort: searchState.order.sort,
-                    dir: searchState.order.dir
+                    search: cleanSearchText(filterState.search),
+                    page: filterState.pagination.page,
+                    per_page: filterState.pagination.per_page,
+                    sort: filterState.order.sort,
+                    dir: filterState.order.dir
                 }
              });
             if(subscribed.current){
                 setCategories(data.data);
                 setTotalRecords(data.meta.total)
-                // setSearchState((prevState) => ({
+                // setfilterState((prevState) => ({
                 //     ...prevState,
                 //     pagination: {
                 //         total: data.meta.total
@@ -168,10 +168,10 @@ const Table: React.FC = () => {
             options={{
                 serverSide: true,
                 responsive: "standard",
-                searchText: searchState.search as any,
-                page: searchState.pagination.page - 1,
+                searchText: filterState.search as any,
+                page: filterState.pagination.page - 1,
                 count: totalRecords,
-                rowsPerPage: searchState.pagination.per_page,
+                rowsPerPage: filterState.pagination.per_page,
                 customToolbar: () => (
                     <FilterResetButton handleClick={() => {
                         dispatch(Creators.setReset())
