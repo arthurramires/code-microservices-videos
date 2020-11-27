@@ -2,18 +2,32 @@ import {useState, useReducer, Dispatch, Reducer} from 'react';
 import reducer, {INITIAL_STATE, Creators, Types} from '../../store/filter';
 import { State as FilterState, Actions as FilterActions } from '../store/filter/types';
 import {MUIDataTableColumn} from 'mui-datatables';
+import { useDebounce } from 'use-debounce';
+import { useHistory } from 'react-router';
+import { History } from 'history';
 
 interface FilterManagerOptions {
     columns: MUIDataTableColumn[];
     rowsPerPage: number;
     rowsPerPageOptions: number[];
     debounceTime: number;
+    history: History;
 }
 
-export default function useFilter(options: FilterManagerOptions){
-    const filterManager = new FilterManager(options);
+interface UseFilterManagerOptions extends Omit<FilterManagerOptions, 'history'>{
+    columns: MUIDataTableColumn[];
+    rowsPerPage: number;
+    rowsPerPageOptions: number[];
+    debounceTime: number;
+}
+
+export default function useFilter(options: UseFilterManagerOptions){
+    const history = useHistory();
+    const filterManager = new FilterManager({...options, history});
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [filterState, dispatch] = useReducer<Reducer<FilterState, FilterActions>>(reducer, INITIAL_STATE);
+    const [debouncedFilterState] = useDebounce(filterState, options.debounceTime);
+
     filterManager.state = filterState;
     filterManager.dispatch = dispatch;
 
@@ -22,6 +36,7 @@ export default function useFilter(options: FilterManagerOptions){
         totalRecords,
         setTotalRecords,
         filterState,
+        debouncedFilterState,
         dispatch,
         filterManager,
         columns: filterManager.columns,
@@ -34,14 +49,14 @@ export class FilterManager {
     columns: MUIDataTableColumn[];
     rowsPerPage: number;
     rowsPerPageOptions: number[];
-    debounceTime: number;
+    history: History;
 
     constructor(options: FilterManagerOptions){
-        const { columns, rowsPerPage, rowsPerPageOptions, debounceTime } = options;
+        const { columns, rowsPerPage, rowsPerPageOptions, history } = options;
         this.columns = columns;
         this.rowsPerPage = rowsPerPage;
         this.rowsPerPageOptions = rowsPerPageOptions;
-        this.debounceTime = debounceTime;
+        this.history = history;
     }
 
     changeSearch(value){
@@ -71,5 +86,23 @@ export class FilterManager {
                     }
                 } : column;
         });
+    }
+
+    cleanSearchText(text){
+        let newText = text;
+        if(text && text.value !== undefined){
+            newText = text.value
+        }
+
+        return newText;
+    }
+
+    pushHistory(){
+        const newLocation = {
+            pathname: '',
+            search: '',
+            state: '',
+        }
+        this.history.push(newLocation);
     }
 }

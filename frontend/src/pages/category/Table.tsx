@@ -87,6 +87,9 @@ const columnDefinitions: TableColumn[] = [
     }
 ];
 
+const debounceTime = 300;
+const debouncedSearchTime = 300;
+
 const Table: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([]);
     const subscribed = useRef(true);
@@ -97,10 +100,11 @@ const Table: React.FC = () => {
         totalRecords,
         setTotalRecords,
         filterState,
-        dispatch
+        dispatch,
+        debouncedFilterState
     } = useFilter({
         columns: columnDefinitions,
-        debounceTime: 500,
+        debounceTime: debounceTime,
         rowsPerPage: 10,
         rowsPerPageOptions: [10, 20, 50],
     });
@@ -113,14 +117,20 @@ const Table: React.FC = () => {
         return () => {
             subscribed.current = false;
         }
-    }, [filterState.search, filterState.pagination.page, filterState.pagination.per_page, filterState.order]);
+    }, [    
+        filterManager.cleanSearchText(debouncedFilterState.search), 
+        debouncedFilterState.pagination.page, 
+        debouncedFilterState.pagination.per_page, 
+        debouncedFilterState.order,
+
+    ]);
 
     async function getData(){
         setLoading(true);
         try {
             const { data } = await categoryHttp.list<ListResponse<Category>>({ 
                 queryParams: {
-                    search: cleanSearchText(filterState.search),
+                    search: filterManager.cleanSearchText(filterState.search),
                     page: filterState.pagination.page,
                     per_page: filterState.pagination.per_page,
                     sort: filterState.order.sort,
@@ -150,14 +160,7 @@ const Table: React.FC = () => {
             setLoading(false);
         }
     }
-    function cleanSearchText(text){
-        let newText = text;
-        if(text && text.value !== undefined){
-            newText = text.value
-        }
-
-        return newText;
-    }
+    
     return (
       <MuiThemeProvider theme={makeActionsStyle(columnDefinitions.length-1)}>
         <DefaultTable
@@ -165,7 +168,7 @@ const Table: React.FC = () => {
             columns={columns}
             data={categories}
             isLoading={loading}
-            debouncedSearchTime={500}
+            debouncedSearchTime={debouncedSearchTime}
             options={{
                 serverSide: true,
                 responsive: "standard",
