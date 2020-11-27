@@ -92,23 +92,19 @@ const Table: React.FC = () => {
     const subscribed = useRef(true);
     const [loading, setLoading] = useState<boolean>(false);
     const {
+        columns,
+        filterManager,
         totalRecords,
         setTotalRecords,
         filterState,
         dispatch
-    } = useFilter();
-    const snackbar = useSnackbar();
-
-    const columns = columnDefinitions.map(column => {
-        return column.name === filterState.order.sort 
-            ? {
-                ...column,
-                options: {
-                    ...column.options,
-                    sortDirection: filterState.order.dir as any
-                }
-            } : column;
+    } = useFilter({
+        columns: columnDefinitions,
+        debounceTime: 500,
+        rowsPerPage: 10,
+        rowsPerPageOptions: [10, 20, 50],
     });
+    const snackbar = useSnackbar();
   
     useEffect(() => {
         subscribed.current = true;
@@ -182,10 +178,11 @@ const Table: React.FC = () => {
                         dispatch(Creators.setReset())
                     }}/>
                 ),
-                onSearchChange: (value) => dispatch(Creators.setSearch({ search: value })),
-                onChangePage: (page) => dispatch(Creators.setPage({ page: page + 1 })),
-                onChangeRowsPerPage: (perPage) => dispatch(Creators.setPerPage({ per_page: perPage })),
-                onColumnSortChange: (changeColumn: string, direction: string) => dispatch(Creators.setOrder({ sort: changeColumn, dir: direction.includes('desc') ? 'desc' : 'asc' })),
+                onSearchChange: (value) => filterManager.changeSearch(value),
+                onChangePage: (page) => filterManager.changePage(page + 1),
+                onChangeRowsPerPage: (perPage) => filterManager.changeRowsPerPage(perPage),
+                onColumnSortChange: (changeColumn: string, direction: string) => 
+                    filterManager.changeColumnSort(changeColumn, direction),
             }}
         />
     </MuiThemeProvider>
