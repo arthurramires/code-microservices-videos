@@ -89,6 +89,8 @@ const columnDefinitions: TableColumn[] = [
 
 const debounceTime = 300;
 const debouncedSearchTime = 300;
+const rowsPerPage = 10;
+const rowsPerPageOptions = [15, 25, 50];
 
 const Table: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([]);
@@ -105,9 +107,13 @@ const Table: React.FC = () => {
     } = useFilter({
         columns: columnDefinitions,
         debounceTime: debounceTime,
-        rowsPerPage: 10,
-        rowsPerPageOptions: [10, 20, 50],
+        rowsPerPage,
+        rowsPerPageOptions,
     });
+
+    useEffect(() => {
+        filterManager.replaceHistory();
+    }, []);
     const snackbar = useSnackbar();
   
     useEffect(() => {
@@ -176,6 +182,7 @@ const Table: React.FC = () => {
                 page: filterState.pagination.page - 1,
                 count: totalRecords,
                 rowsPerPage: filterState.pagination.per_page,
+                rowsPerPageOptions,
                 customToolbar: () => (
                     <FilterResetButton handleClick={() => {
                         dispatch(Creators.setReset())
