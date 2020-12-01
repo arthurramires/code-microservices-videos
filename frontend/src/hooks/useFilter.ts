@@ -16,6 +16,13 @@ interface FilterManagerOptions {
     debounceTime: number;
     history: History;
     tableRef: React.MutableRefObject<MuiDataTableRefComponent>;
+    extraFilter?: ExtraFilter;
+}
+
+interface ExtraFilter{
+    getStateFromURL: (queryParams: URLSearchParams) => any,
+    formatSearchParams: (debouncedState: FilterState) => any,
+    createValidationSchema: () => any,
 }
 
 interface UseFilterManagerOptions extends Omit<FilterManagerOptions, 'history'>{
@@ -59,15 +66,17 @@ export class FilterManager {
     rowsPerPageOptions: number[];
     history: History;
     tableRef: React.MutableRefObject<MuiDataTableRefComponent>;
+    extraFilter?: ExtraFilter;
 
     constructor(options: FilterManagerOptions){
-        const { columns, rowsPerPage, rowsPerPageOptions, history, tableRef } = options;
+        const { columns, rowsPerPage, rowsPerPageOptions, history, tableRef, extraFilter } = options;
         this.columns = columns;
         this.rowsPerPage = rowsPerPage;
         this.rowsPerPageOptions = rowsPerPageOptions;
         this.history = history;
         this.createValidationSchema();
         this.tableRef = tableRef;
+        this.extraFilter = extraFilter;
     }
 
     private resetTablePagination(){
@@ -161,6 +170,9 @@ export class FilterManager {
             ...(this.debouncedState.pagination.page !== 1 && { page: this.debouncedState.pagination.page }),
             ...(this.debouncedState.pagination.per_page !== 15 && { per_page: this.debouncedState.pagination.per_page }),
             ...(this.debouncedState.order.sort && { sort: this.debouncedState.order.sort, dir: this.debouncedState.order.dir }),
+            ...(
+                this.extraFilter && this.extraFilter.formatSearchParams(this.debouncedState)
+            )
         }
     }
 
@@ -176,6 +188,9 @@ export class FilterManager {
                 sort: queryParams.get('sort'),
                 dir: queryParams.get('dir'),
             },
+            ...this.extraFilter && {
+                extraFilter: this.extraFilter.getStateFromURL(queryParams)
+            }
         })
     }
 
@@ -205,7 +220,12 @@ export class FilterManager {
                     .nullable()
                     .transform(value => !value || !['asc', 'desc'].includes(value.toLowerCase()) ? undefined : value)
                     .default(null),
-            })
+            }),
+            ...(
+                this.extraFilter && {
+                    extraFilter: this.extraFilter.createValidationSchema()
+                }
+            )
         });
     }
 }
