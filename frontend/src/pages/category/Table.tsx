@@ -7,7 +7,7 @@ import parseISO from 'date-fns/parseISO';
 import {Link} from 'react-router-dom';
 import categoryHttp from '../../utils/http/category-http';
 import {BadgeYes, BadgeNo} from '../../components/Badge';
-import DefaultTable, {TableColumn, makeActionsStyle} from '../../components/Table';
+import DefaultTable, {TableColumn, makeActionsStyle, MuiDataTableRefComponent} from '../../components/Table';
 import FilterResetButton from '../../components/Table/FilterResetButton';
 import { Category, ListResponse } from '../../utils/models';
 import reducer, {INITIAL_STATE, Creators, Types} from '../../store/filter';
@@ -96,6 +96,8 @@ const Table: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([]);
     const subscribed = useRef(true);
     const [loading, setLoading] = useState<boolean>(false);
+    const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>;
+
     const {
         columns,
         filterManager,
@@ -109,6 +111,7 @@ const Table: React.FC = () => {
         debounceTime: debounceTime,
         rowsPerPage,
         rowsPerPageOptions,
+        tableRef,
     });
 
     useEffect(() => {
@@ -175,6 +178,7 @@ const Table: React.FC = () => {
             data={categories}
             isLoading={loading}
             debouncedSearchTime={debouncedSearchTime}
+            ref={tableRef}
             options={{
                 serverSide: true,
                 responsive: "standard",

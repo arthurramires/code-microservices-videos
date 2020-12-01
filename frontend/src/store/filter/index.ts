@@ -13,17 +13,17 @@ export const { Types, Creators } = createActions<{
     setPage(payload: Typing.SetPageAction['payload']): Typing.SetPageAction
     setPerPage(payload: Typing.SetPerPageAction['payload']): Typing.SetPerPageAction
     setOrder(payload: Typing.SetOrderAction['payload']): Typing.SetOrderAction
-    setReset()
+    setReset(payload: Typing.SetResetAction['payload']): Typing.SetResetAction
 }>({
     setSearch: ['payload'],
     setPage: ['payload'],
     setPerPage: ['payload'],
     setOrder: ['payload'],
-    setReset: []
+    setReset: ['payload']
 });
 
 export const INITIAL_STATE: Typing.State = { 
-    search: '', 
+    search: null, 
     pagination: {
         page: 1,
         per_page: 10,
@@ -82,7 +82,7 @@ function setOrder(state = INITIAL_STATE, action: Typing.SetOrderAction): Typing.
     }
 }
 
-function setReset(state = INITIAL_STATE, action){
-    return { ...INITIAL_STATE, search: { value: null, updated: true } }
+function setReset(state = INITIAL_STATE, action: Typing.SetResetAction){
+    return action.payload.state;
 }
 
